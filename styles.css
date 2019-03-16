@@ -1,0 +1,35 @@
+body { background: rgb(172, 204, 179); color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 10; padding: 0; }
+
+#inputs { background: white; max-width: 250px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; text-align: center; }
+
+#inputs h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+#inputs h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+.fromDB { background: rgb(165, 140, 140); max-width: 500px; margin: 10px auto 10px; padding: 32px 24px; border-radius: 3px; }
+
+.fields { background: rgb(121, 133, 106); max-width: 500px; margin: 10px auto 16px; padding: 32px 24px; border-radius: 3px; box-shadow: 0 0 10px #ccc; text-align: center ; word-wrap : 'break-word'; }
+
+.div {word-wrap : 'break-word';}
+
+button[type=button] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 10px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  word-wrap:'break-word';
+}
+
+input[type=email], input[type=password], input[type=text]{
+width: 100%px;
+padding: 12px 20px;
+margin: 8px 0;
+display: inline-block;
+border: 1px solid #ccc;
+border-radius: 4px;
+box-sizing: border-box;
+}
+
+

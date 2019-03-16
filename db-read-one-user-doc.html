@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DB-read-one-user-doc</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="fromDB" id=titleDiv align=center></div>
+
+  <div class="fromDB" id=headDiv align=center></div>
+
+  <div class="fromDB">
+    <div class="fields" id="fields"></div>
+  </div>
+
+  <div class="fromDB" id=footDiv align=center></div>
+
+  <div class="fromDB" id=notes align=left></div>
+
+
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/5.8.5/firebase-auth.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
+
+  <!-- script src="display-docs.js"></script>    this doesn't work-->
+
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyDe4TVROJcbVJfSZ5WkTZdfK7bWXlnx18Q",
+      authDomain: "jogthem.firebaseapp.com",
+      databaseURL: "https://jogthem.firebaseio.com",
+      projectId: "jogthem",
+      storageBucket: "jogthem.appspot.com",
+      messagingSenderId: "593287500713"
+    };
+    firebase.initializeApp(config);
+  </script>
+
+
+  </script>
+
+
+
+
+  <script>
+     var c = "users"; // to be able to read from other collections and title them change var c
+
+    firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        // User is signed in.
+        console.log('user is signed in.', user.uid);
+
+        var db = firebase.firestore();
+        var userId = user.uid;
+        db.collection(c).doc(userId).get()
+          .then(function (doc) {
+
+            displayDoc(doc);
+
+          })
+          .catch(function (error) {
+            console.error("Error getting docs: ", error);
+          });
+
+      } else {
+        // No user is signed in.
+        console.log('No user is signed in.');
+      }
+    });
+  </script>
+
+  <script>
+    function displayDoc(doc) {
+      console.log(doc.id, "=>", doc.data());
+
+      displayAdminParts(doc)
+      displayUserPart(doc); //users would only see this part normally
+
+    }
+
+    function displayAdminParts(doc){
+      document.getElementById("titleDiv").innerHTML = "<font color ='blue'> Reading from database collection <br> <h1><b>" + c + "</b></h1></font>"; //adding name of collection to title
+      document.getElementById("notes").innerHTML = "<font size=-2><i>Document fields are</i><br>doc.id:<br>email: <br>userName: <br>admin: <br>creator: <br>fan: <br>FCMtoken: <br></font> ";
+      document.getElementById("headDiv").innerHTML = "<font color ='green'>doc.id: </font><hr>" + doc.id + "<p><hr></p>";
+      document.getElementById("footDiv").style.wordWrap = 'break-word';//FCMTokens are long strings
+      document.getElementById("footDiv").innerHTML = "<font color ='darkblue'>FCMtoken:<hr></font> " + doc.data().FCMtoken + "<hr><p></p>";
+      //Firebase Messaging Token not show to user
+    }
+
+    function displayUserPart(doc){ //each time there is a state change the doc is displayed again
+      document.getElementById("fields").innerHTML = "<p> email:<font color = 'white'> <b>" + doc.data().email + "</b></font></p>";
+      document.getElementById("fields").innerHTML += "userName: <b>" + doc.data().userName + "</b><p></p>";
+      document.getElementById("fields").innerHTML += " [<i>  fan: </i>" + doc.data().fan + " ] <p></p>";      
+      document.getElementById("fields").innerHTML += " [<i>  creator:</i> " + doc.data().creator + " ] ";
+      document.getElementById("fields").innerHTML += " [<i>  admin: </i>" + doc.data().admin + " ]<br>";
+    }
+  </script>
+</body>
+</html>

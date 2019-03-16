@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Delete-out</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div id="inputs">
+
+    <button id='check' type="button" onclick="checkUser()">Check if logged in</button>
+    <button id='user' type="button" onclick="isValidUser()">Find user Auth ID</button>
+<hr>
+    <button id='see' type="button" onclick="location.href='db-read-one-user-doc.html'">See user account</button>
+    <hr>
+    <button id='signup' type=button onclick="location.href='sign-up-db-combo.html' ">Sign up to Auth + write to USERS</a>
+      <button id='logout' type="button" onclick="deleteAccount()">Delete account <i>(at auth & users</i>)</button>
+    <hr>  
+      <button id='login' type="button" onclick="location.href='sign-in.html'">Sign in</button>
+    <button id='logout' type="button" onclick="findInputSendAuth()">Sign out</button>
+<hr> 
+<button id='signup' type=button onclick="location.href='developer-index.html' ">Developer index</a>
+  </div>
+
+  <p><hr></p>
+  <p id="Display1"></p>
+  <p id="Display2"></p>
+
+
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script> <!-- console says load this first -->
+
+  <!-- trying this auth only version instead of whole package firebase.js  Whole package caused a .auth not a function error-->
+  <script src="https://www.gstatic.com/firebasejs/5.8.5/firebase-auth.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
+
+
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyDe4TVROJcbVJfSZ5WkTZdfK7bWXlnx18Q",
+      authDomain: "jogthem.firebaseapp.com",
+      databaseURL: "https://jogthem.firebaseio.com",
+      projectId: "jogthem",
+      storageBucket: "jogthem.appspot.com",
+      messagingSenderId: "593287500713"
+    };
+    firebase.initializeApp(config);
+  </script>
+
+  <script>document.getElementById("Display1").innerHTML = "User input or information:";</script>
+
+  <script>document.getElementById("Display2").innerHTML = "Errors:";
+
+
+    function deleteAccount() {
+      var user = "not yet assigned", user_uid;
+      console.log("Inside deleteAccount user=", user);
+      //var email_id = "startValue";
+      firebase.auth().onAuthStateChanged((user) => {  //this is being triggered when someone signs in on another page
+        if (user) {
+          user_uid = user.uid; email_id = user.email;
+          console.log("onAuthStateChange says user id=", user_uid, email_id)
+          //document.getElementById("Display1").innerHTML = "<i>Valid user uid:</i> "+ user_uid + "<p></p><i> Email= </i>" +email_id ;
+          //return(user_uid); //new idea -seems to fail
+
+
+          if (confirm("Script running to delete this user document: " + user_uid)) {
+            var db = firebase.firestore();
+            db.collection('users').doc(user_uid).delete().then(function () {
+              console.log("Document successfully deleted from users!");//this lies. says okay even when there wasn't a document
+
+              // the auth delete does not work
+              var user = firebase.auth().currentUser;
+              console.log('Called current user.uid', user_uid);
+
+              user.delete().then(function () {
+                //user deleted?
+                console.log('User deleted?', user, user_uid);
+
+              }).catch(function (error) {
+                //error
+                console.log('error in deletion', error);
+              });
+
+
+            }).catch(function (error) {
+              console.error("Error removing document: ", error); //does this work? I don't think so
+            });
+          }
+        }
+        else { //alert('No one is logged in. To delete account first log in'); //very strange repeated
+          console.log("deleteUser() finally says id was=", user_uid);//why is this running when user deleted???
+          //document.getElementById("Display1").innerHTML = "User id undefined";
+        }
+      })
+    }
+
+
+    function isValidUser() {   //only works if logged in.   //oddly this runs after a user has been deleted. No idea why. Triggered by onStateChange? 
+      var user = "startValue(isValidUser() )", user_uid;
+      var email_id = "startValue";
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          user_uid = user.uid; email_id = user.email;
+          console.log("isValidUser  says id=", user_uid)
+          document.getElementById("Display1").innerHTML = "<i>Valid user uid:</i> " + user_uid + "<p></p><i> Email= </i>" + email_id;
+          //return(user_uid); //new idea -seems to fail
+        }
+        else {
+          console.log("isValidUser says User id=", user_uid);
+          document.getElementById("Display1").innerHTML = "User id undefined";
+        }
+
+      })
+
+      if (user != null) {
+        var email_id = user.email;
+        //  document.getElementById("Display1").innerHTML = "<i>Valid user uid:</i> "+ user_uid;
+      }
+      else {
+        document.getElementById("Display1").innerHTML = "User NULL not a valid user";
+
+        //document.getElementById('check').style.display = 'none';
+      }
+    }
+
+
+    function checkUser() {
+
+      var user = firebase.auth().currentUser;
+      if (user != null) {
+        var email_id = user.email;
+        document.getElementById("Display1").innerHTML = "<i>Logged in with Email:</i> " + email_id + '<button type="button" onclick="findInputSendAuth()">LogOut</button>';
+
+        //firebase.auth().signOut();
+      }
+
+      else {
+        console.log("checkUser says user=", user);
+        document.getElementById("Display1").innerHTML = "User said to be <i>NULL</i> is not logged in";
+
+
+        // document.getElementById('check').style.display = 'none';
+
+      }
+    }
+  </script>
+
+  <script> // this works called by the button, but not if called by a script. Why?
+    function findInputSendAuth() {
+      //  window.alert("Here test");
+      var user = firebase.auth().currentUser;
+      if (user != null) {
+        var email_id = user.email;
+        document.getElementById("Display1").innerHTML = "<i>Email logging out:</i> " + email_id + '<button type="button" onclick="findInputSendAuth()">LogOut</button>';
+
+        firebase.auth().signOut();//doesn't do anything?
+      }
+      else {
+        document.getElementById("Display1").innerHTML = "User NULL therefore has already logged out";
+      }
+    }
+  </script>
+</body>
+</html>

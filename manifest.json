@@ -1,0 +1,15 @@
+{
+  "name": "Firebase jogthem",
+  "short_name": "jogthem",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff",
+  "lang": "en-US",
+  "description": "fan notifications",
+  "prefer_related_applications": false,
+  "theme_color": "#fff",
+  "scope": "/",
+  
+
+  "gcm_sender_id": "103953800507"
+}

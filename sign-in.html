@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Authenticate-in</title>
+
+  <link rel="stylesheet" href="styles.css">
+
+</head>
+
+
+<body>
+  <!--p >   <h2>Sign in form</h2>  Enter email and password , then click button</p> -->
+  <div id="inputs">
+    <!--label for="Youremail">Email</label> -->
+
+    <input type="email" id="email2" name="email" placeholder="your@email.com">
+    <!--<br>
+     //<label for="Yourpass">Password</label>  -->
+    <br>
+    <input type="password" name="Yourpass" id="pass" placeholder="password">
+    <br>
+    <button type="button" onclick="findInputSendAuth()">Sign in</button>
+  </div>
+  <p>
+    <hr>
+  </p>
+  <p id="Display1"></p>
+  <p id="Display2"></p>
+
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script> <!-- consoal says load this first -->
+
+  <!-- trying this auth only version instead of whole package firebase.js  Whole package caused a .auth not a function error-->
+  <script src="https://www.gstatic.com/firebasejs/5.8.5/firebase-auth.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyDe4TVROJcbVJfSZ5WkTZdfK7bWXlnx18Q",
+      authDomain: "jogthem.firebaseapp.com",
+      databaseURL: "https://jogthem.firebaseio.com",
+      projectId: "jogthem",
+      storageBucket: "jogthem.appspot.com",
+      messagingSenderId: "593287500713"
+    };
+    firebase.initializeApp(config);
+  </script>
+
+  <script>document.getElementById("Display1").innerHTML = "User input shown here:";</script>
+  <script>document.getElementById("Display2").innerHTML = "Errors shown here:";</script>
+
+  <script>
+    function findInputSendAuth() {
+      var Email, pass, errorMess;
+      Email = document.getElementById("email2").value;
+      pass = document.getElementById("pass").value;
+
+      document.getElementById("Display1").innerHTML += "<i>Email:</i> " + Email + "<i> Password:</i> " + pass;
+
+      firebase.auth().signInWithEmailAndPassword(Email, pass).catch(function (error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        if (errorCode == 'auth/weak-password') {
+          alert('The password is too weak.');
+        } else {
+          alert(errorMessage);
+        }
+        document.getElementById("Display2").innerHTML += " " + errorMessage + " ";
+        console.log(error);
+      });
+    }
+  </script>
+
+
+</body>
+
+</html>

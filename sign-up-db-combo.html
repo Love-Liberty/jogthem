@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign-up & DB Input form</title>
+
+  <link rel="stylesheet" href="styles.css">
+
+</head>
+
+
+<body>
+
+  <div id="inputs">
+    <input type="email" id="email" placeholder="your@email.com"><br>
+    <input type="password" id="pass" placeholder="password"><br>
+    <input type="text" id="userName" placeholder="User Name - optional"><br>
+    <button type="button" onclick="findInputSendAuthWriteDb()">New user account sign up</button><br>
+  </div>
+
+
+  <script>
+    var user = "start value";
+
+    function findInputSendAuthWriteDb() {
+      //read inputs from sign-up form
+      var email, pass, userName;
+      email = document.getElementById("email").value;
+      pass = document.getElementById("pass").value;
+      userName = document.getElementById("userName").value;
+
+      console.log(email + " " + pass + " " + userName);
+
+      //send info to authentication, and then to database with same user id
+
+      firebase.auth().createUserWithEmailAndPassword(email, pass).catch(function (error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        if (errorCode == 'auth/weak-password') {
+          alert('The password is too weak.');
+        } else {
+          alert(errorMessage);
+        }
+        console.log(error);
+      }).then(cred => { 
+
+        if(cred) { //comes here even if input failed and auth not done. So checking if valid
+        console.log('Auth completed', cred); //works
+
+        // Values to be written into the database document
+        var userId = cred.user.uid, admin = false, creator = false, fan = true, FCMtoken = "";
+
+        var db = firebase.firestore();
+        return db.collection('users').doc(cred.user.uid).set({
+
+          FCMtoken: FCMtoken, //placeholder for later messaging system
+          admin: admin,       //this may be used later, if system uses web administration
+          creator: creator, //this may be used later, if system supports more than 1 creator
+          email: email,
+          fan: fan, //most users will be classified as fans. If other need to overwrite or use different sign-up
+          userName: userName // Goes on DB, could also go into auth?
+
+        }).then(function () {
+          console.log("Document written with ID: ", userId); //works
+        }).catch(function (error) {
+          // Handle Errors here.        
+          console.log(error);
+        });
+        console.log('write to db no errors'); //doesn't happen???
+
+      }
+
+      });
+
+
+    }
+
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script> <!-- consoal says load this first -->
+
+  <!-- trying this auth only version instead of whole package firebase.js  Whole package caused a .auth not a function error-->
+  <script src="https://www.gstatic.com/firebasejs/5.8.5/firebase-auth.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
+
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyDe4TVROJcbVJfSZ5WkTZdfK7bWXlnx18Q",
+      authDomain: "jogthem.firebaseapp.com",
+      databaseURL: "https://jogthem.firebaseio.com",
+      projectId: "jogthem",
+      storageBucket: "jogthem.appspot.com",
+      messagingSenderId: "593287500713"
+    };
+    firebase.initializeApp(config);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DB-read</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="fromDB" id=backgroundDiv>
+    <div id=titleDiv></div>
+    <div class="fields" id="fields">
+    </div>
+  </div>
+
+
+
+
+
+  <!-- //the 2 datbase scripts -->
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
+  <script src="initialiseFirebase.js"></script>
+
+
+
+  <script>
+    var c = "users"; // to be able to read from other collections and title them change var c       
+    document.getElementById("titleDiv").innerHTML += " Reading from database <font color ='blue'><b>" + c + "</b></font> ";
+
+    var db = firebase.firestore();
+    db.collection(c).get()  //this call on the database takes time so .then acts when the data arrives
+      .then(function (querySnapshot) {
+
+        //console.log("length =", querySnapshot.docs.length);
+
+        document.getElementById("titleDiv").innerHTML += " [" + querySnapshot.docs.length + "] documents in collection";
+
+        querySnapshot.forEach(function (doc) {
+          console.log(doc.id, "=>", doc.data());
+          document.getElementById("fields").innerHTML += "<font color ='brown'>doc.id:<br> " + doc.id + "</font><p></p>";
+          
+          displayUserPart(doc);
+          
+          document.getElementById("fields").style.wordWrap = 'break-word';//FCMTokens are long strings    
+          document.getElementById("fields").innerHTML += "<font color ='darkblue'>FCMtoken:<br> " + doc.data().FCMtoken + "</font><p><hr></p>";
+        });
+      })
+      .catch(function (error) {
+        console.error("Error getting docs: ", error);
+      });
+  </script>
+
+  <script>
+    function displayUserPart(doc) { //each time there is a state change the doc is displayed again
+      document.getElementById("fields").innerHTML += "<p> email:<font color = 'white'> <b>" + doc.data().email + "</b></font></p>";
+      document.getElementById("fields").innerHTML += "userName: <b>" + doc.data().userName + "</b><p></p>";
+      document.getElementById("fields").innerHTML += " [<i>  fan: </i>" + doc.data().fan + " ] <p></p>";
+      document.getElementById("fields").innerHTML += " [<i>  creator:</i> " + doc.data().creator + " ] ";
+      document.getElementById("fields").innerHTML += " [<i>  admin: </i>" + doc.data().admin + " ]<p></p>";
+    }
+  </script>
+</body>
+</html>
