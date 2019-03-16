@@ -12,17 +12,17 @@
   <div id="inputs">
 
     <button id='check' type="button" onclick="checkUser()">Check if logged in</button>
-    <button id='user' type="button" onclick="isValidUser()">Find user Auth ID</button>
+    <button id='userid' type="button" onclick="isValidUser()">Find user Auth ID</button>
 <hr>
-    <button id='see' type="button" onclick="location.href='db-read-one-user-doc.html'">See user account</button>
+    <button id='seeuser' type="button" onclick="location.href='db-read-one-user-doc.html'">See user account</button>
     <hr>
     <button id='signup' type=button onclick="location.href='sign-up-db-combo.html' ">Sign up to Auth + write to USERS</a>
-      <button id='logout' type="button" onclick="deleteAccount()">Delete account <i>(at auth & users</i>)</button>
+      <button id='delete' type="button" onclick="deleteAccount()">Delete account <i>(at auth & users</i>)</button>
     <hr>  
-      <button id='login' type="button" onclick="location.href='sign-in.html'">Sign in</button>
-    <button id='logout' type="button" onclick="findInputSendAuth()">Sign out</button>
+      <button id='signin' type="button" onclick="location.href='sign-in.html'">Sign in</button>
+    <button id='signout' type="button" onclick="findInputSendAuth()">Sign out</button>
 <hr> 
-<button id='signup' type=button onclick="location.href='developer-index.html' ">Developer index</a>
+<button id='index' type=button onclick="location.href='developer-index.html' ">Developer index</a>
   </div>
 
   <p><hr></p>
@@ -54,6 +54,75 @@
   <script>document.getElementById("Display1").innerHTML = "User input or information:";</script>
 
   <script>document.getElementById("Display2").innerHTML = "Errors:";
+
+
+isValidUser()
+
+function isValidUser() {   //only works if logged in.   //oddly this runs after a user has been deleted. No idea why. Triggered by onStateChange? 
+      var user = "startValue(isValidUser() )", user_uid;
+      var email_id = "startValue";
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          user_uid = user.uid; email_id = user.email;
+          console.log("isValidUser  says id=", user_uid)
+          document.getElementById("Display1").innerHTML = "<i>Valid user uid:</i> " + user_uid + "<p></p><i> Email= </i>" + email_id;
+          //return(user_uid); //new idea -seems to fail
+          //show seeUserAccount, signOut, DeleteAccount Hide sign in  sign up
+          showSignOutDelete();
+                }
+        else {
+          console.log("isValidUser says User id=", user_uid);
+          document.getElementById("Display1").innerHTML = "User id undefined";
+          showSignUpSignIn();
+ 
+        }
+
+      })
+
+     
+    }
+
+
+function showSignUpSignIn(){
+console.log('Show sign up and sign in');
+console.log('Hides [sign out]  [delete account] [seeUserAccount]');
+document.getElementById("signout").style.display="none";
+document.getElementById("delete").style.display="none";
+document.getElementById("seeuser").style.display="none";
+
+         //Show sign up and sign in
+}
+
+function showSignOutDelete(){
+  console.log('Show sign out, delete account, seeUserAccount');
+  console.log('Hides [sign in] and [sign up] ');
+  document.getElementById("signin").style.display="none";
+  document.getElementById("signup").style.display="none";  
+}
+
+
+
+function checkUser() {
+
+var user = firebase.auth().currentUser;
+if (user != null) {
+  var email_id = user.email;
+  document.getElementById("Display1").innerHTML = "<i>Logged in with Email:</i> " + email_id + '<button type="button" onclick="findInputSendAuth()">LogOut</button>';
+
+  //firebase.auth().signOut();
+}
+
+else {
+  console.log("checkUser says user=", user);
+  document.getElementById("Display1").innerHTML = "User said to be <i>NULL</i> is not logged in";
+  // document.getElementById('check').style.display = 'none';
+}
+}
+
+
+
+
+
 
 
     function deleteAccount() {
@@ -100,54 +169,10 @@
     }
 
 
-    function isValidUser() {   //only works if logged in.   //oddly this runs after a user has been deleted. No idea why. Triggered by onStateChange? 
-      var user = "startValue(isValidUser() )", user_uid;
-      var email_id = "startValue";
-      firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-          user_uid = user.uid; email_id = user.email;
-          console.log("isValidUser  says id=", user_uid)
-          document.getElementById("Display1").innerHTML = "<i>Valid user uid:</i> " + user_uid + "<p></p><i> Email= </i>" + email_id;
-          //return(user_uid); //new idea -seems to fail
-        }
-        else {
-          console.log("isValidUser says User id=", user_uid);
-          document.getElementById("Display1").innerHTML = "User id undefined";
-        }
-
-      })
-
-      if (user != null) {
-        var email_id = user.email;
-        //  document.getElementById("Display1").innerHTML = "<i>Valid user uid:</i> "+ user_uid;
-      }
-      else {
-        document.getElementById("Display1").innerHTML = "User NULL not a valid user";
-
-        //document.getElementById('check').style.display = 'none';
-      }
-    }
 
 
-    function checkUser() {
 
-      var user = firebase.auth().currentUser;
-      if (user != null) {
-        var email_id = user.email;
-        document.getElementById("Display1").innerHTML = "<i>Logged in with Email:</i> " + email_id + '<button type="button" onclick="findInputSendAuth()">LogOut</button>';
-
-        //firebase.auth().signOut();
-      }
-
-      else {
-        console.log("checkUser says user=", user);
-        document.getElementById("Display1").innerHTML = "User said to be <i>NULL</i> is not logged in";
-
-
-        // document.getElementById('check').style.display = 'none';
-
-      }
-    }
+    
   </script>
 
   <script> // this works called by the button, but not if called by a script. Why?
