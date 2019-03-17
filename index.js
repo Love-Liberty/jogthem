@@ -48,7 +48,10 @@ exports.checkForMessageThenSend = functions.firestore
             //click_action: "https://www.wheretheygowhentheyclick.com"
         }
     }; //test by sending the newly created message to user test@tets.test whose device has the following FCMToken
-    return admin.messaging().sendToDevice(["dTUDhRnUvzY:APA91bHiV-0uVk29Kl-IUYrsEaKLL0rGDtdxqPwJZDKPO5a08ZvcdxnD1xup4hxqA9OYLUII1bV1Xo9uMVK6kHbTEoRiW7tbRh8t0sxHucSDcQukESWLpmtomYuaU97kKiAxD50Mw4GP"], payload);
+    var token = "dTUDhRnUvzY:APA91bHiV-0uVk29Kl-IUYrsEaKLL0rGDtdxqPwJZDKPO5a08ZvcdxnD1xup4hxqA9OYLUII1bV1Xo9uMVK6kHbTEoRiW7tbRh8t0sxHucSDcQukESWLpmtomYuaU97kKiAxD50Mw4GP";
+    return admin.messaging().sendToDevice([token], payload).catch(function(error) {
+        console.error("Error sending message: ", error);
+    });
       }
       else{
         return new Promise((resolve,reject)=>{
