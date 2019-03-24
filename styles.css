@@ -1,14 +1,14 @@
-body { background: rgb(172, 204, 179); color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 10; padding: 0; }
+body { background: rgb(172, 204, 179); color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
 
 #inputs { background: white; max-width: 250px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; text-align: center; }
 
 #inputs h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
 #inputs h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-.fromDB { background: rgb(165, 140, 140); max-width: 500px; margin: 10px auto 10px; padding: 32px 24px; border-radius: 3px; }
+.fromDB { background: rgb(165, 140, 140); max-width: 500px; margin: 10px auto 10px; padding: 10px 8px; border-radius: 3px; }
 
-.fields { background: rgb(121, 133, 106); max-width: 500px; margin: 10px auto 16px; padding: 32px 24px; border-radius: 3px; box-shadow: 0 0 10px #ccc; text-align: center ; word-wrap : 'break-word'; }
+.fields { background: rgb(121, 133, 106); max-width: 500px; margin: 10px auto 16px; padding: 12px 12px; border-radius: 3px; box-shadow: 0 0 10px #ccc; text-align: center ; word-wrap : 'break-word'; }
 
-.div {word-wrap : 'break-word';}
+.div {word-wrap : 'break-word'; }
 
 button[type=button] {
   width: 100%;
