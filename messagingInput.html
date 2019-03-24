@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Message-Input</title>
+
+
+
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.5/firebase-auth.js"></script>
+
+  <script src="initialiseFirebase.js"></script>
+
+  <link rel="stylesheet" href="styles.css">
+
+
+
+  <!-- A text area input box. The user types a Title and a message These are written to Firestore database "messages" collection.
+    A server side Cloud Function is triggered by the creation of this new document and attempts to send it as a notification 
+    through Cloud Messaging 
+    -->
+</head>
+
+<style>
+    button[type=button] {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 10px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  word-wrap:'break-word';
+}
+
+input[type=email], input[type=password], input[type=text]{
+width: 100%px;
+padding: 12px 20px;
+margin: 8px 0;
+display: inline-block;
+border: 1px solid #ccc;
+border-radius: 4px;
+box-sizing: border-box;
+}
+</style>
+
+<body>
+
+
+  <div id="inputs"> <!-- The title and message input form-->
+    <h2>Message input page </h2><br>
+    <form>
+      <input type="text" id="title" name="title" maxlength="80" placeholder="Title of message" required>
+      <textarea id="body" name="body" rows="10" cols="32" maxlength="280"
+        placeholder="Your message up to 280 characters" required></textarea>
+      <button type="button" onclick="checkIfCreator()">Check message</button><br>
+    </form> <!-- When user clicks button, a check is made that the user is authorised. This should be done before showing the form --> 
+
+  </div>
+
+
+
+  <script>
+
+//checkIfCreator(); //null at start.
+
+    function checkIfCreator() {
+      var user = firebase.auth().currentUser;
+      var db = firebase.firestore();
+      var userId = user.uid;
+      db.collection("users").doc(userId).get()
+        .then(function (doc) {
+          console.log("checking if a creator.", doc.data().creator)
+          if (doc.data().creator) {  //only users listesd as 'creator' are allowed to write messages into the database
+
+          var FCMtoken = doc.data().FCMtoken;  //okay Writes this into DB
+          //as a test to make sending messages to self easier
+          //not useful if sending to someone else
+          console.log("Your FCM token is going to be used: ", doc.data().FCMtoken);
+          checkMessage(user, FCMtoken)
+
+
+
+          }
+          else{
+            console.log("Not a creator.");
+            alert('You are not listed as a creator. Therefore you cannot send messages');
+          };
+        })
+        .catch(function (error) {
+          console.error("Error getting docs when checking is a creator: ", error);
+        });
+    }
+
+
+
+
+    function checkMessage(user, FCMtoken) {
+
+      var title = document.getElementById("title").value;
+      var body = document.getElementById("body").value;
+      if (user != null) {
+
+
+        var creator;
+
+        var email_id = user.email;
+        console.log("User " + user.uid + " with Email: " + email_id);
+        if (body != "" && title != "") {
+          console.log(" Clicked to send message entitled : " + title);
+          console.log("with body: " + body);
+          if (confirm("Are you sober enough to confirm sending?")) {
+            writeMessageToDatabase(user, title, body, FCMtoken);
+          }
+        }
+        else {
+          console.log("Title or body of message missing so cannot send message");
+          alert("Title or body of message missing?");
+        }
+
+
+      } else {
+        console.log("User NULL (not logged in) therefore cannot send message");
+      }
+    }
+
+
+    function writeMessageToDatabase(user, title, body, FCMtoken) {
+      //console.log("Write Message not yet implemented therefore cannot send message");
+      firebase.firestore().collection('messages').add({
+        creator: user.uid,
+        title: title,
+        body: body,
+        expiresDays: 30,
+        topic: "",
+        FCMtoken:FCMtoken
+      })
+        .then(function () {
+          console.log("Document written with ID: ", user.uid); //works
+          document.getElementById("title").value = "Success";
+          document.getElementById("body").value = "Your message was written to the database";
+          //document.getElementById("body").placeholder = "Your message was written to the database";
+        }).catch(function (error) {
+          // Handle Errors here.        
+          console.log(error);
+        });
+      console.log('write to db no errors');
+
+    }
+
+  </script>
+
+</body>
+
+</html>
