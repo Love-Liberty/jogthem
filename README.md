@@ -1,4 +1,29 @@
 # jogthem
+
+The files which are deployed as at 24 March 2019 are
+
+index.html
+get-FCMtoken.js
+
+index.js a cloud FUNCTION here called functionIndex.js to not be confuse with a local script. It is deployed on cloud functions
+
+messaging-sw.js (serviceworker) < something wrong here 
+mainfest.json
+
+style.css
+
+The other files listed at github were test files which have been mostly incorporated in index.html
+
+The parts which are currently not working:
+
+On deploy the fetching of an FCM token is failing (although it used to work, and does work on localhost)
+
+When it was working the function sent notifications and console connfirmed this, but I never saw them arrive. A friend who helped test them saw them arrive but then disappear within a few seconds. He was using a PC and Firefox.
+
+There are also two uncaught errors that do not stop the process. One is that messaging-sw.js tries to initailise or load firebase when it already exists. The other is a warning that the serviceworker is not correctly evaluated. (But in local host the code continues to completion)
+
+======================================
+
 A painful learning experience of Firebase javascript, firestore and FCM by someone who once knew PHP and mySQL
 
 The project uses
