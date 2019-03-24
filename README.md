@@ -3,11 +3,13 @@
 The files which are deployed as at 24 March 2019 are
 
 index.html
+
 get-FCMtoken.js
 
 index.js a cloud FUNCTION here called functionIndex.js to not be confuse with a local script. It is deployed on cloud functions
 
 messaging-sw.js (serviceworker) < something wrong here 
+
 mainfest.json
 
 style.css
