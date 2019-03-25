@@ -21,9 +21,18 @@ css/style.css
 
 utilities/ contains webpages that can display the users collection, delete entries and request FCM token. Not directly called from the index page.
 
-The other files listed at github were test files which have been mostly incorporated in index.html
+Almost everything is incorporated in index.html  
 
-The parts which are currently not working:
+Sign-up, sign-in  (Combinging Auth() and creating a user collection document on firestore
+Sign-out, delete account  (delete removes the Auth() entry and deletes the firestore user doc
+request notifications (request FCM token and store in user document)
+
+The only other page is messageInput which is an input form for title and body of a notification which writes to the messages collection at firestore. Latest version for test sends the FCMToken of the person sending the message. (It send when sending to another test participant, but now seems to fail completely, although the function log reports success)
+
+A single function reacts to creation at the messages collection and sends the message via FCM. (Presently under test 24 March)
+(It writes the success or failure to the firebase console)
+
+The parts which are currently not working 24 March 2019:
 
 On deploy the fetching of an FCM token is failing (although it used to work, and does work on localhost)
 
