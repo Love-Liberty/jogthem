@@ -2,17 +2,24 @@
 
 The files which are deployed as at 24 March 2019 are
 
-index.html
-
-get-FCMtoken.js
-
-index.js a cloud FUNCTION here called functionIndex.js to not be confuse with a local script. It is deployed on cloud functions
 
 messaging-sw.js (serviceworker) < something wrong here 
 
+get-FCMtoken.js
+
+index.html
+
 mainfest.json
 
-style.css
+messageInput.html
+
+-------------------
+
+functions/ index.js a cloud FUNCTION
+
+css/style.css
+
+utilities/ contains webpages that can display the users collection, delete entries and request FCM token. Not directly called from the index page.
 
 The other files listed at github were test files which have been mostly incorporated in index.html
 
