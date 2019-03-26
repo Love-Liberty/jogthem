@@ -1,4 +1,8 @@
 # jogthem
+26 March notifications can be received when in localhost but not when in .com  || No idea why.
+
+26 March added manifest.json to index.html (No idea if it matters)
+
 
 The files which are deployed as at 24 March 2019 are
 
