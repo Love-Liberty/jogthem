@@ -51,7 +51,7 @@
      function getInstanceToken(user) {
       // Get Instance ID token. Initially this makes a network call, once retrieved
       // subsequent calls to getToken will return from cache.
-      messaging.getToken().then(function (currentToken) {
+      messaging.getToken().then(function (currentToken) { //sometimes failing on deploy version
         if (currentToken) {
           console.log('currentToken=', currentToken)
           console.log('User=', user)  //okay here
@@ -77,7 +77,7 @@ We are unable to registe…om/firebasejs/5.8.6/firebase-messaging.js:1:32160
           // setTokenSentToServer(false);
         }
       }).catch(function (err) {
-        console.log('An error occurred while retrieving token. ', err);
+        console.log('Error in:  messaging.getToken().then [54]', err);
         //showToken('Error retrieving Instance ID token. ', err);
         //setTokenSentToServer(false);
       });
@@ -105,10 +105,12 @@ We are unable to registe…om/firebasejs/5.8.6/firebase-messaging.js:1:32160
     // - a message is received while the app has focus
     // - the user clicks on an app notification created by a service worker
     //   `messaging.setBackgroundMessageHandler` handler.
+    
     messaging.onMessage(function (payload) {
-      console.log('Message received. ', payload);
+      console.log('Message received. ', payload);  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< deployed without this. No message received
       // ...
     });
+
 
 function sendTokenToServer(user,currentToken){
   
@@ -125,3 +127,4 @@ function sendTokenToServer(user,currentToken){
               //updateUIForPushEnabled(currentToken);
             })
 }
+
