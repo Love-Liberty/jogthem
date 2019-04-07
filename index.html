@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Index</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="/manifest.json">
 </head>
 
 <body>
@@ -15,7 +15,7 @@
   <div class="fromDB" id=headDiv align=center></div>
 -->
 
-  <div class="fromDB">
+  <div class="fromDB" id="homeTitle" hidden>
     <div class="fields" id="fields" hidden></div>
   </div>
 
@@ -25,6 +25,18 @@
 
   <div class="fromDB" id=notes align=left></div>
 -->
+
+
+ <!--    sign-up Form     -->
+ <form id='sign-up-form' hidden>
+  <div id="inputs" >
+      <input type="email" id="email" placeholder="your@email.com"><br>
+      <input type="password" id="pass-up" placeholder="password"><br>
+      <input type="text" id="userName" placeholder="User Name - optional"><br>
+      <button type="button" onclick="findInputSendAuthWriteDb()">New user account sign up</button><br>
+    </div>
+  </form>
+
 
       
       <!--    sign-in Form     -->
@@ -36,37 +48,31 @@
           </div>
         </form>
 
-  <!--    sign-up Form     -->
-  <form id='sign-up-form' hidden>
-  <div id="inputs" >
-      <input type="email" id="email" placeholder="your@email.com"><br>
-      <input type="password" id="pass-up" placeholder="password"><br>
-      <input type="text" id="userName" placeholder="User Name - optional"><br>
-      <button type="button" onclick="findInputSendAuthWriteDb()">New user account sign up</button><br>
-    </div>
-  </form>
-
+ 
 
 
 <div id="inputs" > <!-- Buttons which change depending on null user or signed in user-->
 
   <hr> 
-  <p> 
+  <p>
+  <div id="loading"> Loading </div>
+
     <!--     Changed from calling a webpage to loading the functions     -->  
-    <button id='FCMtoken' type=button onclick="FCMtoken()" hidden>Click to receive notifications or update permission</a></button>
-<!--
-    <button id='FCMtoken' type=button onclick="location.href='messaging.html' " hidden>Click to permit notifications</a></button>
--->
+
+    <div class="fields" id="confirm"> <!--emphasis behind confirm button-->
+    <button id='FCMtoken' type=button onclick="FCMtoken()" hidden>Click CONFIRM to allow, or update, notifications on this device</button>
+    </div>
   </p> 
 
-  <button id='signup' type=button onclick="location.href='sign-up-db-combo.html' "  hidden>Sign up   -   (Auth & db)</a>
+  <button id='signup' type=button onclick="location.href='sign-up-db-combo.html' "  hidden>Sign up   -   (Auth & db)</button> 
   <button id='signin' type="button" onclick="location.href='sign-in.html'" hidden>Sign in</button>
         <hr>
         <!--
         <button id='seeuser' type="button" onclick="location.href='db-read-one-user-doc.html'">See user account</button>
         -->
-  <button id='signout' type="button" onclick="findInputSignOutAuth()" hidden>Sign out</button>
-  <button id='delete' type="button" onclick="deleteAccount()" hidden>Delete account <i>(at auth & users</i>)</button>
+  <button id='signout' type="button" onclick="findInputSignOutAuth()" hidden>Sign out - still get notifications</button>
+  <div class= "fromDB"></div>
+  <button id='delete' type="button" onclick="deleteAccount()" hidden>Delete account - no more notifications</button>
         <hr>
         <!--        
         <button id='check' type="button" onclick="checkUser()">Check if logged in</button>
@@ -75,7 +81,7 @@
         <hr>  
   <button id='sendmessage' type="button" onclick="location.href='messageInput.html' " hidden>Send Message <i>(Creators)</i></button>
    <hr>
-  <button id='index' type=button onclick="location.href='developer-index.html' " hidden>[Developer index]</a>
+  <button id='index' type=button onclick="location.href='developer-index.html' " hidden>[Developer index]</button>
       </div>
 
 
@@ -86,7 +92,7 @@
 <!--            load Scripts           -->
 
   <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase-messaging.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-messaging.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.5/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
   
@@ -107,6 +113,10 @@
 <script src="get-FCMtoken.js"></script>
 
   <script>
+
+//document.getElementById("").innerHTML = "<font color ='blue'><h1>Sign up for notifications</h1> <br> <i>to be sent to your current device</i></font>"; //
+
+
      var c = "users"; // to be able to read from other collections and title them change var c
      var db = firebase.firestore();
        
@@ -120,12 +130,16 @@
  var userId = user.uid;
 
 
+
+
+
+
         db.collection(c).doc(userId).get()
           .then(function (doc) {
 
             userCreator = doc.data().creator;
             console.log('userCreator= ',userCreator);//works
-
+console.log(doc.data().FCMtoken);
         displayDoc(doc);
            showSignOutDelete();  
           })
@@ -169,6 +183,8 @@ console.log('Inside dsiplay user part');
       document.getElementById("fields").innerHTML += " [<i>  fan: </i>" + doc.data().fan + " ] <p></p>";      
       document.getElementById("fields").innerHTML += " [<i>  creator:</i> " + doc.data().creator + " ] ";
       document.getElementById("fields").innerHTML += " [<i>  admin: </i>" + doc.data().admin + " ]<br>";
+
+      document.getElementById("loading").innerHTML ="";
     }
 
 
@@ -176,15 +192,19 @@ console.log('Inside dsiplay user part');
     
     function showSignUpSignIn(){
 console.log('Show sign up and sign in forms');
-console.log('Hides [sign out]  [delete account] [user Account]');
+console.log('Hides [sign out]  [delete account] [user Account]'); //for creators should not allow delete
 
 document.getElementById("signout").style.display="none";
+
 document.getElementById("delete").style.display="none";
+
 //document.getElementById("seeuser").style.display="none"; 
 document.getElementById("sendmessage").style.display="none";
 document.getElementById("FCMtoken").style.display="none";
 
 document.getElementById("fields").style.display="none"; //If no user, the place where data is displayed is off(but data of user still there if just signed out)
+
+document.getElementById("homeTitle").style.display="none";  //<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 document.getElementById("signin").style.display="none"; //no button as form is displayed
 document.getElementById("sign-in-form").style.display="block";
@@ -192,7 +212,7 @@ document.getElementById("sign-in-form").style.display="block";
 document.getElementById("signup").style.display="none";  
 document.getElementById("sign-up-form").style.display="block";
 
-
+document.getElementById("loading").innerHTML ="<font color ='blue'><h1>Sign up for notifications</h1> <br> <i>to be sent to your current device</i></font>";;  //<<<<<<<<<<<<<<<<<<<<<<<
 
          //    Show sign up            OR            sign in
 }
@@ -202,17 +222,23 @@ function showSignOutDelete(){
   console.log('Hides [sign in] and [sign up] ');
 
 document.getElementById("signout").style.display="block";
-document.getElementById("delete").style.display="block";
+
+
+
 //document.getElementById("seeuser").style.display="block";
 
 if (userCreator) {  //Only allow message to be sent by creators 
   console.log('userCreator= ', userCreator)
   document.getElementById("sendmessage").style.display="block";
 }
-else console.log('Not a creator', userCreator); //="start value"
-
+else {console.log('Not a creator', userCreator); //="start value"
+document.getElementById("delete").style.display="block";
+}
 document.getElementById("FCMtoken").style.display="block";
+
 document.getElementById("fields").style.display="block"; //show user details
+
+document.getElementById("homeTitle").style.display="block";  //<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 document.getElementById("signin").style.display="none";
 document.getElementById("signup").style.display="none";
@@ -249,7 +275,7 @@ function deleteAccount() {
           //return(user_uid); //new idea -seems to fail
 
 
-          if (confirm("Script running to delete this user document: " + user_uid)) {
+          if (confirm( email_id  + " Are you sure you want to DELETE your account? User ref: " + user_uid )) {
             var db = firebase.firestore();
             db.collection('users').doc(user_uid).delete().then(function () {
               console.log("Document successfully deleted from users!");//this lies. says okay even when there wasn't a document
