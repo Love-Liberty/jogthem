@@ -12,7 +12,22 @@
   <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.5/firebase-auth.js"></script>
 
-  <script src="initialiseFirebase.js"></script>
+  <!--
+  <script src="initialiseFirebase.js"></script> 
+error-aborted 404
+-->
+
+<script>
+  var config = {
+    apiKey: "AIzaSyDe4TVROJcbVJfSZ5WkTZdfK7bWXlnx18Q",
+    authDomain: "jogthem.firebaseapp.com",
+    databaseURL: "https://jogthem.firebaseio.com",
+    projectId: "jogthem",
+    storageBucket: "jogthem.appspot.com",
+    messagingSenderId: "593287500713"
+  };
+  firebase.initializeApp(config);
+</script>
 
   <link rel="stylesheet" href="styles.css">
 
@@ -22,7 +37,7 @@
     A server side Cloud Function is triggered by the creation of this new document and attempts to send it as a notification 
     through Cloud Messaging 
     -->
-</head>
+
 
 <style>
     button[type=button] {
@@ -47,19 +62,20 @@ border-radius: 4px;
 box-sizing: border-box;
 }
 </style>
+</head>
 
 <body>
 
 
   <div id="inputs"> <!-- The title and message input form-->
-    <h2>Message input page </h2><br>
+    <h2>Message sending page </h2><br>
     <form>
       <input type="text" id="title" name="title" maxlength="80" placeholder="Title of message" required>
       <textarea id="body" name="body" rows="10" cols="32" maxlength="280"
-        placeholder="Your message up to 280 characters" required></textarea>
-      <button type="button" onclick="checkIfCreator()">Check message</button><br>
+        placeholder="Your message up to 280 characters. Then click green button to see what it will appear like. Then click the alert to confirm or cancel. Once you confirm it is too late to cancel." required></textarea>
+      <button type="button" onclick="checkIfCreator()">Click to see notification before sending, then click confirm or cancel. </button><br>
     </form> <!-- When user clicks button, a check is made that the user is authorised. This should be done before showing the form --> 
-
+    <p><a target="_blank" href="index.html">Home</a></p>
   </div>
 
 
@@ -72,6 +88,18 @@ box-sizing: border-box;
       var user = firebase.auth().currentUser;
       var db = firebase.firestore();
       var userId = user.uid;
+
+      var title = document.getElementById("title").value;
+      var body = document.getElementById("body").value;
+      const options = {
+      body:body,
+     icon: "typewriter.jpg",
+    };
+
+    var notification = new Notification(title, options); 
+
+
+
       db.collection("users").doc(userId).get()
         .then(function (doc) {
           console.log("checking if a creator.", doc.data().creator)
@@ -103,8 +131,8 @@ box-sizing: border-box;
 
       var title = document.getElementById("title").value;
       var body = document.getElementById("body").value;
+    
       if (user != null) {
-
 
         var creator;
 
