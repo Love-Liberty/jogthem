@@ -2,6 +2,19 @@
     //const db = firebase.firestore();
     const publicVAPIDKey = 'BA0J3FxC7OARlNQdw9YTA_VviemC_4bQH2EiStd2eQXO9YaDtKOkIFQvg41iWcDAInDScxWh0lTgc5NuwaqHPaM';
     //key from settings web push key pair
+/*
+   // In "Edge" browser this places the notification in tray, but not seen on screen... (trying to test generating a local notification)
+title = "Without onMessage get-FCMtoken.js line 7"
+    const options = {
+      body:"Is it in your notifications tray, but not displayed?",
+     icon: "typewriter.jpg",
+    };
+
+    var notification = new Notification(title, options);  // Goes into notifications tray in PC, but is not displayed
+ 
+*/
+    //self.regulation.showNotification('2nd', options); // does nothing
+
 
     var user, user_uid;
     /*    
@@ -24,20 +37,21 @@
       if (user) {
         user_uid = user.uid; email_id = user.email;
         console.log("onAuthStateChange says user id=", user_uid, email_id)
+        console.log('get-FCMtoken v19.11.07.04');
           console.log("onAuthStateChanged()  says user=", user) //works
 
     //  messaging.usePublicVapidKey(publicVAPIDKey); //on page refresh this works. But error if click again.
         //page refesh triggers StateChange. But why does that matter?
         //moving to after get token made no difference. So 
         //try to prevent second click by hiding button...
-
           console.log('Going to request permission for', user_uid);
+
 
         messaging.requestPermission(user_uid).then(function () {
 
           console.log('Notification granted for user_uid', user_uid);
           //Do stuff here
-          getInstanceToken(user);
+          getInstanceToken(user); //send to server here?
         }).catch(function (err) {
           console.log('Failed to get permission');
         });
@@ -77,7 +91,7 @@ We are unable to registe…om/firebasejs/5.8.6/firebase-messaging.js:1:32160
           // setTokenSentToServer(false);
         }
       }).catch(function (err) {
-        console.log('Error in:  messaging.getToken().then [54]', err);
+        console.log('Error in:  messaging.getInstanceToken().then [54]', err);
         //showToken('Error retrieving Instance ID token. ', err);
         //setTokenSentToServer(false);
       });
@@ -105,12 +119,52 @@ We are unable to registe…om/firebasejs/5.8.6/firebase-messaging.js:1:32160
     // - a message is received while the app has focus
     // - the user clicks on an app notification created by a service worker
     //   `messaging.setBackgroundMessageHandler` handler.
-    
-    messaging.onMessage(function (payload) {
-      console.log('Message received. ', payload);  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< deployed without this. No message received
-      // ...
+
+    //< deployed and served without this. No message received. Then when changed back to how it had been.. still not working. Seems the browser continues to instance of old file???
+    //This is insane
+   
+//Lost internet during tests. 2050 April 6
+//Looks like message is displayed when in background
+//No yet sure what happens without onMessage. On localhost result is nothing?
+// Not sure yet.
+    messaging.onMessage(function (payload) {  //
+      try{  //try???
+      console.log('Message received. ', payload); 
+      
+        //var notification = new Notification('test','body test'); //6 April even though docs say this is optional, that sdk shows notifactions automatically
+        //trying this 6 April... to see if there is some way to get notifications to appear, even though docs say it is automatic
+
+      noteTitle = payload.notification.title;  //looks wrong. no color coding?
+      noteOptions = {
+        body: payload.notification.body,
+        icon: "typewriter.jpg",
+      };
+
+      console.log("title ",noteTitle, " ", payload.notification.body);
+          //var //removing var - no difference
+          //notification = //taking this out No difference. Still goes to tray
+      new Notification(noteTitle, noteOptions);
+/*
+    title = "Test noti from within get-FCMtoken.js line 143"
+    const options = {
+      body:"Is it in your notifications tray, but not displayed?",
+     icon: "typewriter.jpg",
+    };
+
+    var notification = new Notification(title, options); 
+*/
+
+
+    }
+    catch(err){
+      console.log('Caught error: ',err);
+    }
+       // var data = payload.val();  //How do you display a notification? surely it is supposed to be automatic???
+       // console.log('Data?. ', data);
+      //alert('Title?');
     });
 
+    
 
 function sendTokenToServer(user,currentToken){
   
@@ -118,7 +172,7 @@ function sendTokenToServer(user,currentToken){
             FCMtoken: currentToken
           })
             .then(function () {
-              console.log("Token written to doc with ID: ", user_uid);
+              console.log("Token written to doc with ID: ", user_uid, " ",currentToken);
               //document.getElementById("FCMtoken").style.display="none";//FAILS (scope?)prevent repeat click
             })
             .catch(function (error) {
