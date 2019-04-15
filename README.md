@@ -1,4 +1,18 @@
 # jogthem
+
+April 15 2019   System probably working. 
+
+Index allows sign-up to receive notifications, (or sign in to see own account details and have option to delete account).
+Authorised persons have access to the message sending page.
+From there it is possible to send notifications to all the persons who have signed-up to the system.
+
+If you want to fork this, there are extra files to make creating the database easier. 
+
+
+
+
+--------------------
+
 26 March notifications can be received when in localhost but not when in .com  || No idea why.
 
 26 March added manifest.json to index.html (No idea if it matters)
