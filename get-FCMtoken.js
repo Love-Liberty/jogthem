@@ -1,54 +1,27 @@
     const messaging = firebase.messaging();
-    //const db = firebase.firestore();
     const publicVAPIDKey = 'BA0J3FxC7OARlNQdw9YTA_VviemC_4bQH2EiStd2eQXO9YaDtKOkIFQvg41iWcDAInDScxWh0lTgc5NuwaqHPaM';
     //key from settings web push key pair
-/*
-   // In "Edge" browser this places the notification in tray, but not seen on screen... (trying to test generating a local notification)
-title = "Without onMessage get-FCMtoken.js line 7"
-    const options = {
-      body:"Is it in your notifications tray, but not displayed?",
-     icon: "typewriter.jpg",
-    };
-
-    var notification = new Notification(title, options);  // Goes into notifications tray in PC, but is not displayed
- 
-*/
-    //self.regulation.showNotification('2nd', options); // does nothing
-
 
     var user, user_uid;
-    /*    
-        var user = firebase.auth().currentUser;
-    
-        if (user) {
-              userId = user.uid; email_id = user.email;
-              console.log("isValidUser  says id=", user_uid)
-              document.getElementById("Display1").innerHTML = "<i>Valid user uid:</i> " + user_uid + "<p></p><i> Email= </i>" + email_id;
-              //return(user_uid); //new idea -seems to fail
-            }
-            else {
-              console.log("User: ", user);
-              
-            }
-    */
 
   function getFCMtokenSendToServerAskPermission(){
     firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
+    //  if(deleteError) return;  // NEW  v23.54.09.04.19  //If user tried to delete account, but failed, no reason to refresh token
+      if (user && !deleteError) {
         user_uid = user.uid; email_id = user.email;
         console.log("onAuthStateChange says user id=", user_uid, email_id)
-        console.log('get-FCMtoken v19.11.07.04');
+        console.log('get-FCMtoken v23.54.09.04.19');
           console.log("onAuthStateChanged()  says user=", user) //works
 
-    //  messaging.usePublicVapidKey(publicVAPIDKey); //on page refresh this works. But error if click again.
+        //messaging.usePublicVapidKey(publicVAPIDKey); //on page refresh this works. But error if click again.
+//???????????   is the above needed????
+
         //page refesh triggers StateChange. But why does that matter?
         //moving to after get token made no difference. So 
         //try to prevent second click by hiding button...
           console.log('Going to request permission for', user_uid);
 
-
         messaging.requestPermission(user_uid).then(function () {
-
           console.log('Notification granted for user_uid', user_uid);
           //Do stuff here
           getInstanceToken(user); //send to server here?
@@ -57,7 +30,7 @@ title = "Without onMessage get-FCMtoken.js line 7"
         });
       }
       else {
-        console.log("Auth() says User id null=");
+        console.log("Not looking for token. Either Auth() says User id null= or Delete Error", email_id, deleteError);
       }
     })
   }
@@ -91,7 +64,7 @@ We are unable to registe…om/firebasejs/5.8.6/firebase-messaging.js:1:32160
           // setTokenSentToServer(false);
         }
       }).catch(function (err) {
-        console.log('Error in:  messaging.getInstanceToken().then [54]', err);
+        console.log('Error in:  messaging.getToken().then [40]', err);
         //showToken('Error retrieving Instance ID token. ', err);
         //setTokenSentToServer(false);
       });
@@ -134,27 +107,16 @@ We are unable to registe…om/firebasejs/5.8.6/firebase-messaging.js:1:32160
         //var notification = new Notification('test','body test'); //6 April even though docs say this is optional, that sdk shows notifactions automatically
         //trying this 6 April... to see if there is some way to get notifications to appear, even though docs say it is automatic
 
-      noteTitle = payload.notification.title;  //looks wrong. no color coding?
+      noteTitle = payload.notification.title; 
       noteOptions = {
         body: payload.notification.body,
-        icon: "typewriter.jpg",
+        icon: "typewriter.jpg",  //<<<<<<<<<<<<<<<<<<<<<<======================= put creator icon here
       };
 
       console.log("title ",noteTitle, " ", payload.notification.body);
           //var //removing var - no difference
           //notification = //taking this out No difference. Still goes to tray
       new Notification(noteTitle, noteOptions);
-/*
-    title = "Test noti from within get-FCMtoken.js line 143"
-    const options = {
-      body:"Is it in your notifications tray, but not displayed?",
-     icon: "typewriter.jpg",
-    };
-
-    var notification = new Notification(title, options); 
-*/
-
-
     }
     catch(err){
       console.log('Caught error: ',err);
@@ -163,22 +125,43 @@ We are unable to registe…om/firebasejs/5.8.6/firebase-messaging.js:1:32160
        // console.log('Data?. ', data);
       //alert('Title?');
     });
-
     
 
-function sendTokenToServer(user,currentToken){
-  
-  db.collection('users').doc(user_uid).update({
+function sendTokenToServer(user,currentToken){  
+  if(deleteError) return; // the user may have tried to delete account. Don't try to update token
+  db.collection('users').doc(user_uid).update({   // function wants to listen to this and subscribe it, but maybe needs to be a new doc on its own?
             FCMtoken: currentToken
           })
             .then(function () {
               console.log("Token written to doc with ID: ", user_uid, " ",currentToken);
-              //document.getElementById("FCMtoken").style.display="none";//FAILS (scope?)prevent repeat click
+
             })
             .catch(function (error) {
-              // Handle Errors here.        
+
               console.log(error);
-              //updateUIForPushEnabled(currentToken);
+
             })
 }
 
+/*
+
+<!-- Copyright 2019 Trinity Group
+Parts of this software may have been obtained from https://firebase.google.com/docs/web/setup
+which states that code samples are licensed under the Apache License, Version 2.0 (the "License");
+you may not use those parts of this file except in compliance with the License.
+You may obtain a copy of the License at  https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+All other parts and the whole of the software is PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+*/
