@@ -1,5 +1,5 @@
     const messaging = firebase.messaging();
-    const publicVAPIDKey = 'BA0J3FxC7OARlNQdw9YTA_VviemC_4bQH2EiStd2eQXO9YaDtKOkIFQvg41iWcDAInDScxWh0lTgc5NuwaqHPaM';
+    const publicVAPIDKey = 'BA0J3FxC7OARlNQdw9YTA_VviemC_4bQH2EiStd2eQXO9YaDtKOkIFQvg41iWcDAInDScxWh0lTgc1234567890';//replace with your key
     //key from settings web push key pair
 
     var user, user_uid;
