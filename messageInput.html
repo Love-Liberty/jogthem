@@ -1,71 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html>   <!-- Send message text area input box. The user types a Title and a message These are written to Firestore database "messages" collection.
+  A server side Cloud Function is triggered by the creation of this new document and attempts to send it as a notification 
+  through Cloud Messaging 
+  -->
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Message-Input</title>
-
-
+ 
 
   <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.5/firebase-auth.js"></script>
-
+  <script src="initialiseFirebase.js"></script>
   <!--
   <script src="initialiseFirebase.js"></script> 
 error-aborted 404
 -->
 
-<script>
-  var config = {
-    apiKey: "AIzaSyDe4TVROJcbVJfSZ5WkTZdfK7bWXlnx18Q",
-    authDomain: "jogthem.firebaseapp.com",
-    databaseURL: "https://jogthem.firebaseio.com",
-    projectId: "jogthem",
-    storageBucket: "jogthem.appspot.com",
-    messagingSenderId: "593287500713"
-  };
-  firebase.initializeApp(config);
-</script>
-
   <link rel="stylesheet" href="styles.css">
 
-
-
-  <!-- A text area input box. The user types a Title and a message These are written to Firestore database "messages" collection.
-    A server side Cloud Function is triggered by the creation of this new document and attempts to send it as a notification 
-    through Cloud Messaging 
-    -->
-
-
-<style>
-    button[type=button] {
-  width: 100%;
-  background-color: #4CAF50;
-  color: white;
-  padding: 14px 10px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  word-wrap:'break-word';
-}
-
-input[type=email], input[type=password], input[type=text]{
-width: 100%px;
-padding: 12px 20px;
-margin: 8px 0;
-display: inline-block;
-border: 1px solid #ccc;
-border-radius: 4px;
-box-sizing: border-box;
-}
-</style>
 </head>
-
 <body>
-
 
   <div id="inputs"> <!-- The title and message input form-->
     <h2>Message sending page </h2><br>
@@ -75,7 +32,7 @@ box-sizing: border-box;
         placeholder="Your message up to 280 characters. Then click green button to see what it will appear like. Then click the alert to confirm or cancel. Once you confirm it is too late to cancel." required></textarea>
       <button type="button" onclick="checkIfCreator()">Click to see notification before sending, then click confirm or cancel. </button><br>
     </form> <!-- When user clicks button, a check is made that the user is authorised. This should be done before showing the form --> 
-    <p><a target="_blank" href="index.html">Home</a></p>
+    <p><a target="_self" href="index.html">Home</a></p>
   </div>
 
 
@@ -108,7 +65,7 @@ box-sizing: border-box;
           var FCMtoken = doc.data().FCMtoken;  //okay Writes this into DB
           //as a test to make sending messages to self easier
           //not useful if sending to someone else
-          console.log("Your FCM token is going to be used: ", doc.data().FCMtoken);
+         // console.log("Your FCM token is going to be used: ", doc.data().FCMtoken);
           checkMessage(user, FCMtoken)
 
 
@@ -133,15 +90,14 @@ box-sizing: border-box;
       var body = document.getElementById("body").value;
     
       if (user != null) {
-
         var creator;
-
         var email_id = user.email;
         console.log("User " + user.uid + " with Email: " + email_id);
+
         if (body != "" && title != "") {
           console.log(" Clicked to send message entitled : " + title);
           console.log("with body: " + body);
-          if (confirm("Are you sober enough to confirm sending?")) {
+          if (confirm("The example should be visible below. Or check in your notifications. Also are you sober enough to confirm sending?")) {
             writeMessageToDatabase(user, title, body, FCMtoken);
           }
         }
@@ -149,8 +105,6 @@ box-sizing: border-box;
           console.log("Title or body of message missing so cannot send message");
           alert("Title or body of message missing?");
         }
-
-
       } else {
         console.log("User NULL (not logged in) therefore cannot send message");
       }
@@ -177,11 +131,27 @@ box-sizing: border-box;
           console.log(error);
         });
       console.log('write to db no errors');
-
     }
-
   </script>
 
-</body>
+<!-- Copyright 2019 Trinity Group
+Parts of this software may have been obtained from https://firebase.google.com/docs/web/setup
+which states that code samples are licensed under the Apache License, Version 2.0 (the "License");
+you may not use those parts of this file except in compliance with the License.
+You may obtain a copy of the License at  https://www.apache.org/licenses/LICENSE-2.0
 
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+All other parts and the whole of the software is PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+</body>
 </html>
