@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html> <!-- Use once only. Creates the structure of the database. Authenticates original manager and writes details in as user and as creator  -->
+<!-- works 18.22.15.04.2019  BUT second entry form is not processed (This would be to add 2nd manager or the owner)-->
+        <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <title>Jog-CreateDatabseStructure</title>
+                <link rel="stylesheet" href="creator-style.css">
+                <link rel="manifest" href="/manifest.json">
+
+              </head>
+              <body>
+
+                    <!-- Fields is where user details displayed-->
+                    <div class="fromDB" id="homeTitle" >
+                      <div class="fields" id="fields" hidden></div>
+                    </div>
+
+<!--      An account has been opened for a database. There is currently zero content or structure. Read/write is unrestricted  -->
+<!--      This script is to create the collections and to assign a manager and/or owner-->                    
+
+                    <!--    sign-up Form     -->
+                    <form id='sign-up-form' >
+                      <div id="inputs">     
+                        <input type="email" id="emailManager" placeholder="1 manager@email.com"><br> <!-- or manager's email?-->
+                        <input type="password" id="pass-up" placeholder="2 password"><br>
+                        <input type="text" id="userName" placeholder="3 manager online name"><br>
+                        <button type="button" onclick="findInputSendAuthWriteDb()">4 Create New system</button><br>
+                      </div>
+                    </form>
+
+                    <form id='creator-form' > <!--use to add to system -->
+                      <div id="inputs">     
+                        <input type="email" id="emailcreator" placeholder="5 creator @email.com"><br> <!-- or manager's email?-->
+                    <!--
+  <input type="text" id="creator_Id" placeholder="creator_Id copied from creator-app auth"><br>
+                    -->
+                      
+                        <input type="password" id="pass-upcreator" placeholder="6 creator password-use the above creator_Id"><br>
+                        <input type="text" id="userNamecreator" placeholder="7 creator online name"><br>
+                       <button type="button" onclick="findCreatorInputSendAuthWriteDb()">8 Add creator to the system</button><br>
+                      
+                      </div>
+                    </form>
+
+
+
+
+                    <div id="inputs">
+                            <!-- Buttons which change depending on null user or signed in user-->
+                            <hr>
+                          
+                            <button id='signout' type="button" onclick="findInputSignOutAuth()" hidden>Sign out - still get
+                              notifications</button>
+                        
+                            <div class="fromDB" id="dataRules">
+                              <!-- Instructions and TOS printed here -->
+                            </div>
+                          </div>
+
+<!--            load Scripts           -->
+<script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.8.5/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
+<script src="initialiseFirebase.js"></script>
+
+<script>
+        
+       // var db = firebase.firestore();  //NEED SET UP NEW PROJECT
+
+        var userCreator;
+        var deleteError = false; //irrelevant
+
+        document.getElementById("homeTitle").innerHTML = " You are about to create the database structure for a new system.<ul>"+
+        "<li>Put manager details in 1,2,3</li>"+
+        "<li>Click button 4</li>"+
+        "<li>This creates users / creators and messages collections</li><p>" +
+        "<li>Then add creator in 5,6,7 </li>"+
+        "<li>Assign a temporary password (can use id from the jog-creators-app application)</li>"+
+        "<li>This adds the creator to authentication, users and creator collections as owner</li></ul>"+
+        "<p><b>Do not run this more than once.</b>";
+ 
+        
+function findCreatorInputSendAuthWriteDb(){
+    //read inputs from sign-up form
+    var emailManager, pass, userName;
+      emailCreator = document.getElementById("emailcreator").value;
+      pass = document.getElementById("pass-upcreator").value;
+      userName = document.getElementById("userNamecreator").value;
+
+      console.log(emailCreator + " " + pass + " " + userName);  //emailManager correct here
+
+      //send info to authentication, and then to database with same user id
+
+      firebase.auth().createUserWithEmailAndPassword(emailCreator, pass).catch(function (error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        if (errorCode == 'auth/weak-password') {
+          alert('The password is too weak.');
+        } else {
+          alert(errorMessage);
+        }
+        console.log(error);
+      }).then(cred => {
+        // writeUserNameToAuth(); // is this worthwhile? Seems to throw error anyway usetr.updateProfile is not function
+
+        if (cred) { //comes here even if input failed and auth not done. So checking if valid
+          console.log('Auth completed', cred); //works
+
+          // Values to be written into the database document
+          var userId = cred.user.uid, admin = true, creator = true, fan = true, FCMtoken = "";
+
+          var db = firebase.firestore();
+          //return 
+          db.collection('users').doc(cred.user.uid).set({  //why 'return'?   //Write to users worked 17.52.15.04.2019
+
+            FCMtoken: FCMtoken, //placeholder for later messaging system
+            admin: admin,       //this may be used later, if system uses web administration
+            creator: creator, //this may be used later, if system supports more than 1 creator
+            email: emailCreator,  // emailManager correct here
+            fan: fan, //most users will be classified as fans. If other need to overwrite or use different sign-up
+            userName: userName // Goes on DB, could also go into auth?
+
+          }).then(function () {
+            console.log("User document written with ID: ", userId); //works
+          //  FCMtokenFunction();  //EDIT  odd throwing error "is not a function" but accepted higher up on page (and tokens done twice?)   
+writeToNewCreatorCollection(cred.user.uid, emailCreator,userName,"owner");
+
+document.getElementById("creator-form").style.display = "none"; //prevent second creation process
+document.getElementById("homeTitle").innerHTML = emailCreator + " Authenticated and written in users and in creators<br>"+
+"with id:"+ cred.user.uid + " " + userName;
+        }).catch(function (error) {
+            // Handle Errors here.        
+            console.log(error);
+          });
+          //console.log('write to db no errors'); //doesn't happen???
+        }
+      });
+    }
+
+
+
+
+
+    
+    function findInputSendAuthWriteDb() { //auth worked 17.52.15.04.2019
+      //read inputs from sign-up form
+      var emailManager, pass, userName;
+      emailManager = document.getElementById("emailManager").value;
+      pass = document.getElementById("pass-up").value;
+      userName = document.getElementById("userName").value;
+
+      console.log(emailManager + " " + pass + " " + userName);  //emailManager correct here
+
+      //send info to authentication, and then to database with same user id
+
+      firebase.auth().createUserWithEmailAndPassword(emailManager, pass).catch(function (error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        if (errorCode == 'auth/weak-password') {
+          alert('The password is too weak.');
+        } else {
+          alert(errorMessage);
+        }
+        console.log(error);
+      }).then(cred => {
+        // writeUserNameToAuth(); // is this worthwhile? Seems to throw error anyway usetr.updateProfile is not function
+
+        if (cred) { //comes here even if input failed and auth not done. So checking if valid
+          console.log('Auth completed', cred); //works
+
+          // Values to be written into the database document
+          var userId = cred.user.uid, admin = true, creator = false, fan = true, FCMtoken = "";
+
+          var db = firebase.firestore();
+          //return 
+          db.collection('users').doc(cred.user.uid).set({  //why 'return'?   //Write to users worked 17.52.15.04.2019
+
+            FCMtoken: FCMtoken, //placeholder for later messaging system
+            admin: admin,       //this may be used later, if system uses web administration
+            creator: creator, //this may be used later, if system supports more than 1 creator
+            email: emailManager,  // emailManager correct here
+            fan: fan, //most users will be classified as fans. If other need to overwrite or use different sign-up
+            userName: userName // Goes on DB, could also go into auth?
+
+          }).then(function () {
+            console.log("User document written with ID: ", userId); //works
+          //  FCMtokenFunction();  //EDIT  odd throwing error "is not a function" but accepted higher up on page (and tokens done twice?)   
+          document.getElementById("homeTitle").innerHTML = emailManager + " Authenticated and written in users<br>"+
+"with id:"+ cred.user.uid + " " + userName;
+          writeToNewCreatorCollection(cred.user.uid, emailCreator,userName);
+createAMessagesCollection();
+document.getElementById("sign-up-form").style.display = "none"; //prevent second creation process
+
+
+        }).catch(function (error) {
+            // Handle Errors here.        
+            console.log(error);
+          });
+          //console.log('write to db no errors'); //doesn't happen???
+        }
+      });
+    }
+   
+function writeToNewCreatorCollection(uid,email,userName,permissionLevel){  //Failed to write collection
+   // var permissionLevel = "manager";
+    console.log('Write the creator to a new creator collection', uid," ", email," ",permissionLevel);
+
+    var db = firebase.firestore();
+    return db.collection('creators').doc(uid).set({  
+      
+      email: email,
+      permissionLevel  : permissionLevel, //most users will be classified as fans. If other need to overwrite or use different sign-up
+      userName: userName// Goes on DB, could also go into auth?
+      
+    }).then(function (){
+        console.log("creator document written: ", uid, " ",email," ",permissionLevel," ",userName);
+        document.getElementById("homeTitle").innerHTML = email + " Written in creators<br>"+
+"with id:"+ uid + " " + userName + " " + permissionLevel;
+    }).catch(function (error) {
+            // Handle Errors here.        
+            console.log(error);
+          })
+}
+
+function createAMessagesCollection(){
+    console.log('create a message collection');
+    var db = firebase.firestore();
+    return db.collection('messages').add({  
+        FCMtoken: "", 
+        body: "Just an initial entry when creating the database",
+        creator  : "Not yet", //
+        expiresDays: 30,//
+        title:"Blank starter",
+        topic:"creatorMain", 
+      
+    }).then(function (){
+        //console.log("message document written to database: ", title, " ",body," ",topic," ",expireDays);
+    }).catch(function (error) {
+            // Handle Errors here.        
+            console.log(error);
+          }) 
+}
+
+
+      </script>
