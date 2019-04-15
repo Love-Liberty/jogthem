@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html> <!-- let user request new password. Rest handled by authentication infrastructure-->
+
+<!-- Copyright 2019 Trinity Group
+Parts of this software may have been obtained from https://firebase.google.com/docs/web/setup
+which states that code samples are licensed under the Apache License, Version 2.0 (the "License");
+you may not use those parts of this file except in compliance with the License.
+You may obtain a copy of the License at  https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+All other parts and the whole of the software is PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JogThem</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="/manifest.json">
+</head>
+
+<body>
+
+  <!-- Fields is where user details displayed-->
+  <div class="fromDB" id="homeTitle" hidden >
+    <div class="fields" id="fields" ></div>
+  </div>
+
+ <!--    sign-in Form     -->
+ <form id='sign-in-form' >
+
+        <div id="inputs">
+          <input type="email" id="email" name="email" placeholder="your@email.com"><br>       
+          <button type="button" onclick="findInputSendEmail()">Click to receive email to change password</button>
+        </div>
+    
+      </form>
+    
+
+<!--            load Scripts           -->
+
+<script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.8.5/firebase-auth.js"></script>
+<script src="initialiseFirebase.js"></script>
+
+
+
+<script>
+
+
+function findInputSendEmail(){    
+    var auth = firebase.auth();
+var email = document.getElementById("email").value;
+console.log(">",email,"<", email.length);
+
+
+auth.sendPasswordResetEmail(email).then(function() {
+  // Email sent.
+  document.getElementById("sign-in-form").style.display = "none";
+  document.getElementById("homeTitle").style.display = "block";
+document.getElementById("homeTitle" ).innerHTML = "The email has been sent. It could go into your spam folder. When found, just click, then enter a new password."
+}).catch(function(error) {
+  // 
+  document.getElementById("homeTitle").style.display = "block";
+  document.getElementById("homeTitle" ).innerHTML = "Something went wrong.";
+  console.log(error)
+});
+//*/
+}
+
+
+
+</script>
+
+
+</body>
+</html>
