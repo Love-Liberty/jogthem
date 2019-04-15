@@ -1,157 +1,156 @@
 <!DOCTYPE html>
-<html>
+<html>  <!-- Jogthem where fans Sign-up to be notified via cloud messaging.  Calls "initialiseFirebase.js" "get-FCMtoken.js" -->
+
+<!-- Copyright 2019 Trinity Group
+Parts of this software may have been obtained from https://firebase.google.com/docs/web/setup
+which states that code samples are licensed under the Apache License, Version 2.0 (the "License");
+you may not use those parts of this file except in compliance with the License.
+You may obtain a copy of the License at  https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+All other parts and the whole of the software is PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+
+<!-- Jogthem where fans Sign-up to be notified via cloud messaging.
+
+Display starts with sign-up form,  sign-in form  + "sign up for notifications" explanation.   +forgotten password link
+
+When click New account, this contacts the authentication server and then writes to the user database
+The display is changed to show the users data read from the database and a sign-out button and a delete account button
+The software then sets-up the messaging system.
+
+Signing out is of little value other than protection from other persons using same computer
+
+Delete first tries to delete the databse entry and then tries to cancel listing at authentication. 
+If the latter fails the software rewrites the data to db and announces error.
+(The re-write is to make later deletion possible without throwing errors)
+
+
+
+-->
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Index</title>
+  <title>JogThem</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="/manifest.json">
 </head>
 
 <body>
-  <!--
-    <div class="fromDB" id=titleDiv align=center></div>
 
-  <div class="fromDB" id=headDiv align=center></div>
--->
-
+  <!-- Fields is where user details displayed-->
   <div class="fromDB" id="homeTitle" hidden>
     <div class="fields" id="fields" hidden></div>
   </div>
 
+  <!--    sign-up Form     -->
+  <form id='sign-up-form' hidden>
+    <div id="inputs">
 
-  <!--
-  <div class="fromDB" id=footDiv align=center></div>
+      <!-- this button not used? -->
+      <button id='FCMtoken-sign-up' type=button onclick="FCMtokenFunction" hidden>1) Click to allow notifications on
+        this device</button>
 
-  <div class="fromDB" id=notes align=left></div>
--->
-
-
- <!--    sign-up Form     -->
- <form id='sign-up-form' hidden>
-  <div id="inputs" >
-      <input type="email" id="email" placeholder="your@email.com"><br>
+      <input type="email" id="email" placeholder="Enter your@email.com"><br>
       <input type="password" id="pass-up" placeholder="password"><br>
       <input type="text" id="userName" placeholder="User Name - optional"><br>
-      <button type="button" onclick="findInputSendAuthWriteDb()">New user account sign up</button><br>
+      <button type="button" onclick="findInputSendAuthWriteDb()">New user account sign up to be kept
+        informed</button><br>
     </div>
   </form>
 
+  <!--    sign-in Form     -->
+  <form id='sign-in-form' hidden>
 
+    <div id="inputs">
+      <input type="email" id="email2" name="email" placeholder="your@email.com"><br>
+      <input type="password" name="Yourpass" id="pass" placeholder="password"><br>
+      <button type="button" onclick="findInputSignInAuth()">Sign in to refresh notification permission</button>
+
+
+<p class='minor'><a target="_self" href="resetEmailAddress.html">forgotten password</a></p>
       
-      <!--    sign-in Form     -->
-      <form id='sign-in-form' hidden>
-          <div id="inputs" >   
-          <input type="email" id="email2" name="email" placeholder="your@email.com"><br>
-          <input type="password" name="Yourpass" id="pass" placeholder="password"><br>
-          <button type="button" onclick="findInputSignInAuth()">Sign in</button>
-          </div>
-        </form>
-
- 
-
-
-<div id="inputs" > <!-- Buttons which change depending on null user or signed in user-->
-
-  <hr> 
-  <p>
-  <div id="loading"> Loading </div>
-
-    <!--     Changed from calling a webpage to loading the functions     -->  
-
-    <div class="fields" id="confirm"> <!--emphasis behind confirm button-->
-    <button id='FCMtoken' type=button onclick="FCMtoken()" hidden>Click CONFIRM to allow, or update, notifications on this device</button>
     </div>
-  </p> 
 
-  <button id='signup' type=button onclick="location.href='sign-up-db-combo.html' "  hidden>Sign up   -   (Auth & db)</button> 
-  <button id='signin' type="button" onclick="location.href='sign-in.html'" hidden>Sign in</button>
-        <hr>
-        <!--
-        <button id='seeuser' type="button" onclick="location.href='db-read-one-user-doc.html'">See user account</button>
-        -->
-  <button id='signout' type="button" onclick="findInputSignOutAuth()" hidden>Sign out - still get notifications</button>
-  <div class= "fromDB"></div>
-  <button id='delete' type="button" onclick="deleteAccount()" hidden>Delete account - no more notifications</button>
-        <hr>
-        <!--        
-        <button id='check' type="button" onclick="checkUser()">Check if logged in</button>
-        <button id='userid' type="button" onclick="isValidUser()">Find user Auth ID</button>
-        -->
-        <hr>  
-  <button id='sendmessage' type="button" onclick="location.href='messageInput.html' " hidden>Send Message <i>(Creators)</i></button>
-   <hr>
-  <button id='index' type=button onclick="location.href='developer-index.html' " hidden>[Developer index]</button>
+  </form>
+
+  <div id="inputs">
+    <!-- Buttons which change depending on null user or signed in user-->
+    <hr>
+    <p>
+      <div class="fromDB" id="marker">
+        <!-- this div is a horizontal marker above a button -->
+        <div id="loading"> Loading </div> <!--   Changes when data available     -->
       </div>
+    </p>
+    <button id='signin' type="button" onclick="location.href='sign-in.html'" hidden>Sign in</button>
+    <hr>
+    <button id='signout' type="button" onclick="findInputSignOutAuth()" hidden>Sign out - still get
+      notifications</button>
+
+    <div class="fromDB" id="dataRules">
+      <!-- Instructions and TOS printed here -->
+    </div>
+
+    <button id='delete' type="button" onclick="deleteAccount()" hidden>Delete account - no more notifications</button>
+    <hr>
+    <button id='sendmessage' type="button" onclick="location.href='messageInput.html' " hidden>Send message page
+      <i>(Click me and tell the world)</i></button>
+    <hr>
+    <hr>
+  </div>
 
 
-
-
-
-
-<!--            load Scripts           -->
+  <!--            load Scripts           -->
 
   <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-messaging.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.5/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.4/firebase-firestore.js"></script>
-  
-  
-  <script>
-    // Initialize Firebase
-    var config = {
-      apiKey: "AIzaSyDe4TVROJcbVJfSZ5WkTZdfK7bWXlnx18Q",
-      authDomain: "jogthem.firebaseapp.com",
-      databaseURL: "https://jogthem.firebaseio.com",
-      projectId: "jogthem",
-      storageBucket: "jogthem.appspot.com",
-      messagingSenderId: "593287500713"
-    };
-    firebase.initializeApp(config);
-  </script>
-
-<script src="get-FCMtoken.js"></script>
+  <script src="initialiseFirebase.js"></script>
+  <script src="get-FCMtoken.js"></script>
 
   <script>
+    //var c = "users"; // to be able to read from other collections and title them change var c
+    var db = firebase.firestore();
+    var userCreator;
+    var deleteError = false;
 
-//document.getElementById("").innerHTML = "<font color ='blue'><h1>Sign up for notifications</h1> <br> <i>to be sent to your current device</i></font>"; //
-
-
-     var c = "users"; // to be able to read from other collections and title them change var c
-     var db = firebase.firestore();
-       
-        var userCreator;
-
-    firebase.auth().onAuthStateChanged(function (user) {  
+    firebase.auth().onAuthStateChanged(function (user) {
+      if(deleteError) return;
       if (user) {
         // User is signed in.
 
-        console.log('user is signed in.', user.email, " ", user.uid );
- var userId = user.uid;
+        console.log('user is signed in.', user.email, " ", user.uid);
+        var userId = user.uid;
 
-
-
-
-
-
-        db.collection(c).doc(userId).get()
+        db.collection("users").doc(userId).get()
           .then(function (doc) {
-
             userCreator = doc.data().creator;
-            console.log('userCreator= ',userCreator);//works
-console.log(doc.data().FCMtoken);
-        displayDoc(doc);
-           showSignOutDelete();  
+            console.log('userCreator= ', userCreator);//works, but sometimes logs 'undefined'
+            console.log(doc.data().FCMtoken);
+            displayDoc(doc);
+            showSignOutDelete();
           })
           .catch(function (error) {
-            console.error("Error getting or displaying: ", error);
+            console.error("Error getting or displaying: ", error); //Cannot read 'creator' of undefined //Why throwing this? April 10
+            showSignUpSignIn(); //if user tried to delete, but auth() said no => there is no user doc so error
           });
-
       } else {
         // No user is signed in.
         console.log('No user is signed in.');
         showSignUpSignIn();
- 
       }
     });
   </script>
@@ -159,128 +158,126 @@ console.log(doc.data().FCMtoken);
   <script>
     function displayDoc(doc) {
       console.log(doc.id, "=>", doc.data());
-
-      //displayAdminParts(doc) //don't display admin part to users
       displayUserPart(doc); //users would only see this part normally
-
     }
-/*
-    function displayAdminParts(doc){
 
-      document.getElementById("titleDiv").innerHTML = "<font color ='blue'> Reading from database collection <br> <h1><b>" + c + "</b></h1></font>"; //adding name of collection to title
-      document.getElementById("notes").innerHTML = "<font size=-2><i>Document fields are</i><br><b>doc.id:</b> This is your auth() unique ID also used in the user database<br><b>email:</b> used for sign-up and sign-in<br><b>userName:</b> Optional<br><b>admin</b>: for those who can alter the database entries<br><b>creator:</b> allows you to send messages<br><b>fan:</b> allows you to receive messages<br><b>FCMtoken:</b> a code that identifies your device for receiving messages<br></font> ";
-      document.getElementById("headDiv").innerHTML = "<font color ='green'>doc.id: </font><hr>" + doc.id + "<p><hr></p>";
-      document.getElementById("footDiv").style.wordWrap = 'break-word';//FCMTokens are long strings
-      document.getElementById("footDiv").innerHTML = "<font color ='darkblue'>FCMtoken:<hr></font> " + doc.data().FCMtoken + "<hr><p></p>";
-      //Firebase Messaging Token not show to user
-    }
-*/
-    function displayUserPart(doc){ //each time there is a state change the doc is displayed again
-console.log('Inside dsiplay user part');
+    function displayUserPart(doc) { //each time there is a state change the doc is displayed again
+      console.log('Inside dsiplay user part');
       document.getElementById("fields").style.wordWrap = 'break-word'; //for small screens
       document.getElementById("fields").innerHTML = "<p> email:<font color = 'white'> <b>" + doc.data().email + "</b></font></p>";
       document.getElementById("fields").innerHTML += "userName: <b>" + doc.data().userName + "</b><p></p>";
-      document.getElementById("fields").innerHTML += " [<i>  fan: </i>" + doc.data().fan + " ] <p></p>";      
-      document.getElementById("fields").innerHTML += " [<i>  creator:</i> " + doc.data().creator + " ] ";
-      document.getElementById("fields").innerHTML += " [<i>  admin: </i>" + doc.data().admin + " ]<br>";
+      // document.getElementById("fields").innerHTML += " [<i>  fan: </i>" + doc.data().fan + " ] <p></p>";
+      // document.getElementById("fields").innerHTML += " [<i>  creator:</i> " + doc.data().creator + " ] ";
+      // document.getElementById("fields").innerHTML += " [<i>  admin: </i>" + doc.data().admin + " ]<br>";
 
-      document.getElementById("loading").innerHTML ="";
+      document.getElementById("loading").innerHTML = "";
     }
 
 
-//             Sign up    or Sign in            //
-    
-    function showSignUpSignIn(){
-console.log('Show sign up and sign in forms');
-console.log('Hides [sign out]  [delete account] [user Account]'); //for creators should not allow delete
+    //             Sign up    or Sign in            //
 
-document.getElementById("signout").style.display="none";
+    function showSignUpSignIn() {
+      console.log('Show sign up and sign in forms');
+      console.log('Hides [sign out]  [delete account] [user Account]'); //for creators should not allow delete
 
-document.getElementById("delete").style.display="none";
+      document.getElementById("signout").style.display = "none";
 
-//document.getElementById("seeuser").style.display="none"; 
-document.getElementById("sendmessage").style.display="none";
-document.getElementById("FCMtoken").style.display="none";
+      document.getElementById("delete").style.display = "none";
 
-document.getElementById("fields").style.display="none"; //If no user, the place where data is displayed is off(but data of user still there if just signed out)
+      document.getElementById("sendmessage").style.display = "none";
+            // document.getElementById("FCMtoken-sign-in").style.display = "block";  //  
+            // document.getElementById("FCMtoken-sign-up").style.display = "block";  //  
 
-document.getElementById("homeTitle").style.display="none";  //<<<<<<<<<<<<<<<<<<<<<<<<<<
+      document.getElementById("fields").style.display = "none"; //If no user, the place where data is displayed is off(but data of user still there if just signed out)
 
-document.getElementById("signin").style.display="none"; //no button as form is displayed
-document.getElementById("sign-in-form").style.display="block";
+      document.getElementById("homeTitle").style.display = "none";  //<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-document.getElementById("signup").style.display="none";  
-document.getElementById("sign-up-form").style.display="block";
+            // document.getElementById("signin").style.display = "none"; //no button as form is displayed
+      document.getElementById("sign-in-form").style.display = "block";
 
-document.getElementById("loading").innerHTML ="<font color ='blue'><h1>Sign up for notifications</h1> <br> <i>to be sent to your current device</i></font>";;  //<<<<<<<<<<<<<<<<<<<<<<<
+            // document.getElementById("signup").style.display = "none";
+      document.getElementById("sign-up-form").style.display = "block";
 
-         //    Show sign up            OR            sign in
-}
+      document.getElementById("loading").innerHTML = "<font color ='blue'><h1>Sign up for notifications</h1> <br> <i>to be sent to your current device</i></font>";;  //<<<<<<<<<<<<<<<<<<<<<<<
 
-function showSignOutDelete(){
-  console.log('Show sign out, delete account, send message, get token, UserAccount');
-  console.log('Hides [sign in] and [sign up] ');
+      document.getElementById("dataRules").innerHTML = " You are requesting that the creator sends you notifications to your device and sometimes by email.<p>" +
+        "You are doing so on the basis of wanting to be contacted about the service described above.<p>" +
+        "You agree to such use of your data and to being contacted by notifications or email.<p>" +
+        "The information you supply is to be used for the purpose of arranging and managing the above service.<p>" +
+        "The information you are putting into the database or databases may be stored or processed outside the European Union. This site uses cookies.<p>" +
+        "If you want the notifications to go to a different device (not the one you are using to read this) please sign-up using the other device.<p>" +
+        "If you want to change to another device. Either delete your existing account OR use the other device to sign-up with a different email address.<p>" +
 
-document.getElementById("signout").style.display="block";
+        "You may cancel by coming back to this website, signing in and clicking the delete account button. That removes your details from the system";
+      //    sign up            OR            sign in
+    }
 
+    function showSignOutDelete() {
+      console.log('Show sign out, delete account, send message, get token, UserAccount');
+      console.log('Hides [sign in] and [sign up] ');
+      document.getElementById("signout").style.display = "block";
+            //document.getElementById("seeuser").style.display="block";
+      document.getElementById("dataRules").innerHTML = ""; //remove the terms that are displayed prior to sign-up
+      if (userCreator) {  //Only allow message to be sent by creators 
+        console.log('userCreator= ', userCreator)
+        document.getElementById("sendmessage").style.display = "block";
+        document.getElementById("dataRules").innerHTML = " <b>Hi, creator</b><br> <i>Please bookmark this site so you can find it again</i><p>" +
+          "When sending notification messages, they can't be recalled.<p> But someone will recall it."
+        document.getElementById("fields").innerHTML += "<i>is a creator who can send notifications</i>";
+      }
+      else {
+        console.log('Not a creator', userCreator); //="start value"
+        document.getElementById("delete").style.display = "block";
+        document.getElementById("dataRules").innerHTML = " <b>Thank you and welcome.</b><br> <i>Please bookmark this site so you can find it again</i><p>" +
+          "The creator may send you notifications to your device and sometimes by email.<p>" +
+          "This is on the basis of wanting to be contacted by the creator.<p>" +
+          "You agree to such use of your data and to being contacted by notifications or email.<p>" +
+          "The information you supply is to be used for the purpose of arranging and managing the above service.<p>" +
+          "The information shown above may be stored or processed outside the European Union. This site uses cookies.<p>" +
+          "If you want the notifications to go to a different device (not the one you are using to read this) please sign-up using the other device.<p>" +
+          "If you want to change to another device. Either delete your existing account OR use the other device to sign-up with a different email address.<p>" +
+          "Notification permission for any site can be changed by clicking in the address bar near the lock symbol. Also they tend to automatically expire at times.<p>" +
+          "If you notice that they have stopped, please come back to this page and sign in. That will renew the permission. You may also see interesting news<p>" +
+          "The delete button below removes your details from the system, but it may take a while for the change to move across the internet";
+      }
+            // document.getElementById("FCMtoken").style.display = "block";
 
-
-//document.getElementById("seeuser").style.display="block";
-
-if (userCreator) {  //Only allow message to be sent by creators 
-  console.log('userCreator= ', userCreator)
-  document.getElementById("sendmessage").style.display="block";
-}
-else {console.log('Not a creator', userCreator); //="start value"
-document.getElementById("delete").style.display="block";
-}
-document.getElementById("FCMtoken").style.display="block";
-
-document.getElementById("fields").style.display="block"; //show user details
-
-document.getElementById("homeTitle").style.display="block";  //<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-document.getElementById("signin").style.display="none";
-document.getElementById("signup").style.display="none";
-document.getElementById("sign-in-form").style.display="none"; 
-document.getElementById("sign-up-form").style.display="none";
-
-
-}
-
+      document.getElementById("fields").style.display = "block"; //show user details
+      document.getElementById("homeTitle").style.display = "block";  //
+            //document.getElementById("signin").style.display = "none";
+            //document.getElementById("signup").style.display = "none";
+      document.getElementById("sign-in-form").style.display = "none";
+      document.getElementById("sign-up-form").style.display = "none";
+    }
   </script>
 
-<script> 
+  <script>
 
-
-function FCMtoken(){
-  console.log('inside FCMtoken');
-  getFCMtokenSendToServerAskPermission();
-      document.getElementById("FCMtoken").style.display="none";
+    function FCMtokenFunction() {
+      console.log('inside FCMtoken');
+      getFCMtokenSendToServerAskPermission();
+      // document.getElementById("FCMtoken").style.display = "none";
       //prevent repeat click of this button- after first click there is an uncaught error
       // of use public key before get token. If refresh, then works for first click again
-}
+    }
 
-
-function deleteAccount() {
+    function deleteAccount() {
       var status = "not yet deleted";
       var user_uid;
-      console.log("Inside deleteAccount user=", user, "status=",status); //status is to prevnt the authState command being active after a delete and new state change
-      //var email_id = "startValue";
+     
       firebase.auth().onAuthStateChanged((user) => {  //this is being triggered when someone signs-up
-        if (user && status == "not yet deleted" ) {
+        if (user && status == "not yet deleted") {
           user_uid = user.uid; email_id = user.email;
-          console.log("onAuthStateChange says user id=", user_uid, email_id)
-          //document.getElementById("Display1").innerHTML = "<i>Valid user uid:</i> "+ user_uid + "<p></p><i> Email= </i>" +email_id ;
-          //return(user_uid); //new idea -seems to fail
+          console.log("onAuthStateChange says user id=", user_uid, email_id, "status=", status)
+                //document.getElementById("Display1").innerHTML = "<i>Valid user uid:</i> "+ user_uid + "<p></p><i> Email= </i>" +email_id ;
+                //return(user_uid); //new idea -seems to fail
 
-
-          if (confirm( email_id  + " Are you sure you want to DELETE your account? User ref: " + user_uid )) {
+          if (confirm(" Are you sure you want to DELETE your " + email_id + " account? ******* Your user ref is: " + user_uid + "******")) {
             var db = firebase.firestore();
             db.collection('users').doc(user_uid).delete().then(function () {
               console.log("Document successfully deleted from users!");//this lies. says okay even when there wasn't a document
 
-              // the auth delete does not work
+              // the auth delete can fail due to no recent login, but the user docs are gone. Use docs can't wait till auth deleted because database rule requires auth? 
               var user = firebase.auth().currentUser;
               console.log('Called current user.uid', user_uid);
 
@@ -291,8 +288,31 @@ function deleteAccount() {
 
               }).catch(function (error) {
                 //error
-                console.log('error in deletion', error);
+                console.log('error in deletion', error); //happens when no recent sign in
+               
+console.log("set doc again with", user_uid); //write to db so that later attempt to delete doesn't throw "no document" error
+
+db.collection('users').doc(user_uid).set({ //Doc weas deleted but auth still there... hard to get to delete auth
+
+FCMtoken: "deletion-error", //placeholder for later messaging system
+admin: false,       //this may be used later, if system uses web administration
+creator: false, //this may be used later, if system supports more than 1 creator
+email: "error@error.error",
+fan: false, //most users will be classified as fans. If other need to overwrite or use different sign-up
+userName: "Tried to delete error"
               });
+findInputSignOutAuth();
+document.getElementById("dataRules").innerHTML = "<b>Deleting your details</b><br>"+
+                "The authorisation system wants you to sign-in again to confirm this, this is a security issue because some time has passed.<br>";
+//Complicated to deal with this later. Either batch these two actions in some way or rewrite data to users
+alert('The system wants you to sign-in again to confirm. Please click this alert closed and then sign in.');
+document.getElementById("sign-in-form").style.display = "block";
+document.getElementById("signout").style.display = "none";
+document.getElementById("delete").style.display = "none";
+document.getElementById("sign-up-form").style.display = "none";
+
+deleteError = true; //try to prevent onAuthChange displaying forms
+              }); //end catch user delete error
 
 
             }).catch(function (error) {
@@ -300,54 +320,49 @@ function deleteAccount() {
             });
           }
         }
-        else { //alert('No one is logged in. To delete account first log in'); //very strange repeated
+        else { //user said no to deletion (or user=null)-  Oddly if later says yes, deletion may run twice.
           console.log("deleteUser() says status =", status);//why is this running when user deleted???
           //document.getElementById("Display1").innerHTML = "User id undefined";
+          showSignUpSignIn(); //new 17.06 10 april
         }
       })
-    }  
+    }
 
-        function findInputSignOutAuth() {
-          //  window.alert("Here test");
-          var user = firebase.auth().currentUser;
-          if (user != null) {
-          //  var email_id = user.email;
-           // document.getElementById("Display1").innerHTML = "<i>Email logging out:</i> " + email_id + '<button type="button" onclick="findInputSendAuth()">LogOut</button>';
-    
-            firebase.auth().signOut();
-          }
-          else {
-           // document.getElementById("Display1").innerHTML = "User NULL therefore has already logged out";
-          }
+    function findInputSignOutAuth() {
+      //  window.alert("Here test");
+      var user = firebase.auth().currentUser;
+      if (user != null) {
+        firebase.auth().signOut();
+      }
+      else {
+      }
+    }
+
+  </script>
+
+  <script>
+    function findInputSignInAuth() {
+      var Email, pass, errorMess;
+      Email = document.getElementById("email2").value;
+      pass = document.getElementById("pass").value;
+      firebase.auth().signInWithEmailAndPassword(Email, pass).then(function () {
+        FCMtokenFunction(); //EDIT seems to work. When sign-in it gets token and sends to db. Without this it doesn't
+      }).catch(function (error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        if (errorCode == 'auth/weak-password') {
+          alert('The password is too weak.');
+        } else {
+          alert(errorMessage);
         }
-        
-      </script>
-
-<script>
-        function findInputSignInAuth() {
-          var Email, pass, errorMess;
-          Email = document.getElementById("email2").value;
-          pass = document.getElementById("pass").value;
-    
-//          document.getElementById("Display1").innerHTML += "<i>Email:</i> " + Email + "<i> Password:</i> " + pass;
-    
-          firebase.auth().signInWithEmailAndPassword(Email, pass).catch(function (error) {
-            // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            if (errorCode == 'auth/weak-password') {
-              alert('The password is too weak.');
-            } else {
-              alert(errorMessage);
-            }
-            //document.getElementById("Display2").innerHTML += " " + errorMessage + " ";
-            console.log(error);
-          });
-        }
-      </script>
+        console.log(error);
+      });
+    }
+  </script>
 
 
-<script>
+  <script>
     var user = "start value"; //
 
     function findInputSendAuthWriteDb() {
@@ -371,34 +386,50 @@ function deleteAccount() {
           alert(errorMessage);
         }
         console.log(error);
-      }).then(cred => { 
+      }).then(cred => {
+        // writeUserNameToAuth(); // is this worthwhile? Seems to throw error anyway usetr.updateProfile is not function
 
-        if(cred) { //comes here even if input failed and auth not done. So checking if valid
-        console.log('Auth completed', cred); //works
+        if (cred) { //comes here even if input failed and auth not done. So checking if valid
+          console.log('Auth completed', cred); //works
 
-        // Values to be written into the database document
-        var userId = cred.user.uid, admin = false, creator = false, fan = true, FCMtoken = "";
+          // Values to be written into the database document
+          var userId = cred.user.uid, admin = false, creator = false, fan = true, FCMtoken = "";
 
-        var db = firebase.firestore();
-        return db.collection('users').doc(cred.user.uid).set({
+          var db = firebase.firestore();
+          //return 
+          db.collection('users').doc(cred.user.uid).set({  //why 'return'?
 
-          FCMtoken: FCMtoken, //placeholder for later messaging system
-          admin: admin,       //this may be used later, if system uses web administration
-          creator: creator, //this may be used later, if system supports more than 1 creator
-          email: email,
-          fan: fan, //most users will be classified as fans. If other need to overwrite or use different sign-up
-          userName: userName // Goes on DB, could also go into auth?
+            FCMtoken: FCMtoken, //placeholder for later messaging system
+            admin: admin,       //this may be used later, if system uses web administration
+            creator: creator, //this may be used later, if system supports more than 1 creator
+            email: email,
+            fan: fan, //most users will be classified as fans. If other need to overwrite or use different sign-up
+            userName: userName // Goes on DB, could also go into auth?
 
-        }).then(function () {
-          console.log("Document written with ID: ", userId); //works
-        }).catch(function (error) {
-          // Handle Errors here.        
-          console.log(error);
-        });
-        console.log('write to db no errors'); //doesn't happen???
-      }
+          }).then(function () {
+            console.log("Document written with ID: ", userId); //works
+            FCMtokenFunction();  //EDIT  odd throwing error "is not a function" but accepted higher up on page (and tokens done twice?)   
+          }).catch(function (error) {
+            // Handle Errors here.        
+            console.log(error);
+          });
+          //console.log('write to db no errors'); //doesn't happen???
+        }
       });
     }
+
+    function writeUserNameToAuth() {  //Not used. Throws error.
+      user.updateProfile({
+        displayName: userName,
+        //photoURL: ""
+      }).then(function () {
+        // Update successful.
+      }).catch(function (error) {
+        // An error happened.
+      });
+    }
+
   </script>
 </body>
+
 </html>
