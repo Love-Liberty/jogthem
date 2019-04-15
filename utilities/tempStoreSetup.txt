@@ -1,0 +1,17 @@
+//Place the cloud messaging keys here until needed. 
+//(Obtain from firebase console. Gear wheel, project settings, cloud messaging)
+
+
+//Server key -hover on right of long string, copy paste from console
+//very long string which goes into
+//
+
+
+//bottom of console page "Web Push certificates" click "Generate key pair"  then copy and paste here
+// shorter string which goes into
+//get-FCMtoken.js  as PUBLICVAPIDKEYS=
+
+
+//project snippet from GEARWHEEL </> it has two scripts. 
+//Need to place here and then move part to insitialiseFirebase.js 
+//(leave out the frist app.js script  and delete the two <script>  </script> )
