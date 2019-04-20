@@ -1,12 +1,24 @@
 # jogthem
+April 15 2019 System probably working.
 
-April 15 2019   System probably working. 
+Index allows sign-up to receive notifications, (or sign in to see own account details and have option to delete account). Authorised persons have access to the message sending page. From there it is possible to send notifications to all the persons who have signed-up to the system.
 
-Index allows sign-up to receive notifications, (or sign in to see own account details and have option to delete account).
-Authorised persons have access to the message sending page.
-From there it is possible to send notifications to all the persons who have signed-up to the system.
+If you want to fork this, there is the extra file (run-once-create-db.html) to make creating the database easier.
+It requires a Google Firebase account using the following services:
 
-If you want to fork this, there are extra files to make creating the database easier. 
+Authentication - for sign-up, sign-in and database access
+Firestore - database which stores user emails and is where messages are stored
+Functions - which checks for new users or deleted users and new messagaes on the database and processes them
+Messaging - which keeps track of which uses are subscribed to which message topics and which sends the messages
+
+The initialiseFirebase.js file is where the Firebase setup code is placed after you have opened an account with hosting.
+There is one html page for followers to sign-up. The same page is used by the owner to sign-in.
+On sign-in the owner sees a button which links to the message sending page.
+
+After entering a title and the body of the message, a warning asks if you are sufficiently sober to actually send the message.
+An illustration of the notification appears on the screen. If click 'send' on the confirmation then the message is written to the database.
+
+A cloud function is waiting for this. It picks up the stored message and sends it to the messaging system which send it out to everyone registered for the topic. (Currently there is only 1 topic)
 
 
 
