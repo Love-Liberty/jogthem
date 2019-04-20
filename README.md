@@ -7,8 +7,11 @@ If you want to fork this, there is the extra file (run-once-create-db.html) to m
 It requires a Google Firebase account using the following services:
 
 Authentication - for sign-up, sign-in and database access
+
 Firestore - database which stores user emails and is where messages are stored
+
 Functions - which checks for new users or deleted users and new messagaes on the database and processes them
+
 Messaging - which keeps track of which uses are subscribed to which message topics and which sends the messages
 
 The initialiseFirebase.js file is where the Firebase setup code is placed after you have opened an account with hosting.
